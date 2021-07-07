@@ -1,0 +1,14 @@
+---
+version: 11
+debian_package:
+  - percona-postgresql-{{ version }}
+  - percona-postgresql-{{ version }}-repack
+  - percona-postgresql-{{ version }}-pgaudit
+  - percona-pgbackrest
+  - percona-patroni
+  - percona-pg-stat-monitor{{ version }}
+  - percona-pgbouncer
+  - percona-pgaudit{{ version }}-set-user
+  - percona-pgbadger
+  - percona-postgresql-{{ version }}-wal2json
+  - percona-postgresql-contrib
