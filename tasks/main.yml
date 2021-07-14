@@ -1,6 +1,6 @@
 ---
 ##################
-# Percona_cluster #
+# Postgres Installation #
 ##################
 - name: Gather OS specific variables
   include_vars: "{{ item }}"
@@ -8,6 +8,11 @@
     - "{{ ansible_distribution }}.yml"
     - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
 
-- name: Installation of Galera Cluster on Ubuntu
-  include_tasks: Debian.yml
-  when: ansible_os_family == "Debian"
+- name: Installation of Postgres
+  include_tasks: "{{ ansible_distribution }}.yml"
+
+#########################
+# Postgres Configuration #
+#########################
+- name: Configuration on Postgres
+  include_tasks: "configure.yml"

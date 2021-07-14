@@ -1,2 +1,8 @@
 ---
-# defaults file for osm_percona_postgres
+postgresql_database: false
+version: 9.5
+postgres_port: 5432
+postgres_listen_addresses: localhost
+
+user: postgres
+group: postgres
