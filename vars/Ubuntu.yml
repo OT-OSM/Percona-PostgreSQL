@@ -12,5 +12,5 @@ debian_package:
   - percona-pgbadger
   - percona-postgresql-{{ version }}-wal2json
   - percona-postgresql-contrib
-replication: false
+replication_enabled: false
 

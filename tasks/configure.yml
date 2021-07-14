@@ -1,7 +1,7 @@
 ---
 - name: Congfigure Postgresql
   template:
-    src: ubuntu_postgresql.j2
+    src: "{{ ansible_distribution }}_postgresql.j2"
     dest: /etc/postgresql/{{ version }}/main/postgresql.conf
 
 - name: Restart postgresql
