@@ -1,8 +1,32 @@
 ---
-postgresql_database: false
-version: 9.5
+version: 11
+
+# Postgres connection settings.
 postgres_port: 5432
 postgres_listen_addresses: localhost
 
-user: postgres
-group: postgres
+# Databases.
+database_creation: true
+psql_databases:
+  - name: appdb
+    lc_collate: utf8_general_ci
+    encoding: utf8
+    conn_limit: 10
+    owne: appuser
+
+# Users.
+users_creation: true
+
+psql_users:
+  - name: appuser
+    password: monitoringSecret@123
+    priv: "CONNECT/table1:ALL"
+  - name: monitoring
+    password: monitoringSecret@123
+    priv: "CONNECT/CREATE/table1:SELECT/table2:INSERT"
+
+
+# Postgres cluster settings.
+replication: false
+replica_user: replicant
+replica_pass: Rep@1234

@@ -1,8 +1,18 @@
 ---
-- name: Congfigure Postgresql
-  template:
-    src: "{{ ansible_distribution }}_postgresql.j2"
-    dest: /etc/postgresql/{{ version }}/main/postgresql.conf
+- name: Add new configuration to "postgresql.conf"
+  blockinfile:
+    dest: /etc/postgresql/{{ version }}/main/server.conf
+    block: |
+      include 'server.conf'
+
+- name: Add new configuration to "server.conf"
+  blockinfile:
+    create: yes
+    owner: postgres
+    group: postgres
+    dest: /etc/postgresql/{{ version }}/main/server.conf
+    block: |
+      listen_addresses = '{{ postgres_listen_addresses }}'
 
 - name: Restart postgresql
   service:

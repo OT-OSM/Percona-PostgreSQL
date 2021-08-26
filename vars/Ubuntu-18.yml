@@ -1,0 +1,11 @@
+---
+version: 11
+debian_package:
+  - percona-postgresql-{{ version }}
+  - percona-postgresql-{{ version }}-pgaudit
+  - percona-pg-stat-monitor{{ version }}
+  - percona-postgresql-contrib
+replication: true
+users_creation: true
+database_creation: true
+

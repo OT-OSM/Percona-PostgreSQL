@@ -1,0 +1,17 @@
+---
+- name: create a db
+  postgresql_db:
+    name: "{{ item.name }}"
+    lc_collate: "{{ item.lc_collate }}"
+    encoding: "{{ item.encoding }]"
+    conn_limit: "{{ item.conn_limit }}"
+    port: "{{ postgres_port }}"
+    state: present
+  with_items:
+    - "{{ psql_databases }}"
+  become_user: postgres
+  become: true
+  tags:
+    - create_database
+  when:
+    - inventory_hostname not in groups['slave']

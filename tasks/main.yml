@@ -5,14 +5,30 @@
 - name: Gather OS specific variables
   include_vars: "{{ item }}"
   with_first_found:
-    - "{{ ansible_distribution }}.yml"
     - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_distribution }}.yml"
 
-- name: Installation of Postgres
+- name: Including tasks for installation of Postgres
   include_tasks: "{{ ansible_distribution }}.yml"
 
 #########################
 # Postgres Configuration #
 #########################
-- name: Configuration on Postgres
+- name: Including tasks for Configuration of Postgres
   include_tasks: "configure.yml"
+
+# ################## #
+# Cluster Postgres   #
+# ################## #
+
+- name: Including tasks to Replication Setup
+  include_tasks: replication.yml
+  when: replication
+
+- name: Including tasks for user_creation
+  include_tasks: users.yml
+  when: users_creation
+
+- name: Including tasks for database creation
+  include_tasks: database.yml
+  when: database_creation
