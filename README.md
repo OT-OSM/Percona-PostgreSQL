@@ -1,31 +1,93 @@
 Osm Percona Postgres
 ====================
 
-A brief description of the role goes here.
+A high end ansible role to setup standalone or a cluster Percona Postgres with version support 11 and above with best practices in terms of security and performance tunning.
+
+Version History
+---------------
+
+|**Date**| **Version**| **Description**| **Changed By** |
+|----------|---------|---------------|-----------------|
+|**Aug '31** | v0.0.1 | Initial Draft | [Abhishek Vishwakarma](abhishek.vishwakarma@opstree.com)|
+
+
+Supported OS
+------------
+  * Ubuntu: bionic
+  * Ubuntu: focal
 
 Requirements
 ------------
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+There is no such requirements for the role.
+
 
 Role Variables
 --------------
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+The role variables are defined in the [vars](./defaults/main.yml). Here is the list of variables that is used in this role
 
-Dependencies
-------------
+|Variable | Description|
+|---------|------------|
+| postgresql_database| Set true when want to create database|
+| version | Define version of postgresql|
+| postgres_listen_addresses | Define Address when want to setup standalone|
+|postgres_port |Define Address when want to setup standalone|
+| postgresql_users | Set true when want to create user|
+| user_list_attr | List of users to create|
+| database_list | List of database to create|
+| replica_user| User of the postgreSQL|
+| replica_pass | Group of the postgreSQL |
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+Inventory
+----------
+An inventory should look like this:-
+```ini
+[master]                 
+192.168.1.198
+
+[slave]
+192.168.3.201
+
+[postgres_cluster:children]
+master
+slave
+
+[postgres_cluster:vars]
+ansible_user=ubuntu
+```
 
 Example Playbook
 ----------------
+Here is an example of playbook to execute this role:-
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+```yaml
+---
+- hosts: postgres_cluster
+  roles:
+    - role: percona_postgres
+      become: yes
+```
+## Usage
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
+There are multiple ways of executing the playbook according to your environment
+
+- To run complete role
+
+```shell
+ansible-playbook -i hosts site.yml
+```
+- To create users
+
+```shell
+ansible-playbook -i hosts site.yml --tags "create_user"
+```
+
+- To create databases
+
+```shell
+ansible-playbook -i hosts site.yml --tags "create_database"
+```
 
 License
 -------
@@ -34,5 +96,4 @@ BSD
 
 Author Information
 ------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+[Abhishek Vishwakarma](abhishek.vishwakarma@opstree.com)
