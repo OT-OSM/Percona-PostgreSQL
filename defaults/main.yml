@@ -19,11 +19,15 @@ users_creation: true
 
 psql_users:
   - name: appuser
-    password: monitoringSecret@123
-    priv: "CONNECT/table1:ALL"
+    password: AppUser#Secret@123
+    objs: "ALL_IN_SCHEMA"
+    priv: "ALL"
+    db: "appdb"
   - name: monitoring
-    password: monitoringSecret@123
-    priv: "CONNECT/CREATE/table1:SELECT/table2:INSERT"
+    password: Monitoring#Secret@123
+    objs: "ALL_IN_SCHEMA"
+    priv: "SELECT,INSERT,UPDATE,DELETE"
+    db: "appdb"
 
 
 # Postgres cluster settings.
