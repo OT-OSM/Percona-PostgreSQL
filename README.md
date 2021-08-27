@@ -29,13 +29,12 @@ The role variables are defined in the [vars](./defaults/main.yml). Here is the l
 
 |Variable | Description|
 |---------|------------|
-| postgresql_database| Set true when want to create database|
 | version | Define version of postgresql|
 | postgres_listen_addresses | Define Address when want to setup standalone|
 |postgres_port |Define Address when want to setup standalone|
-| postgresql_users | Set true when want to create user|
-| user_list_attr | List of users to create|
-| database_list | List of database to create|
+| users_creation | Set true when want to create user|
+| database_creation| Set true when want to create database|
+| replication | Set true for cluster configuration|
 | replica_user| User of the postgreSQL|
 | replica_pass | Group of the postgreSQL |
 
