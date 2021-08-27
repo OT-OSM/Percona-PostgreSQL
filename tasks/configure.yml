@@ -1,7 +1,7 @@
 ---
 - name: Add new configuration to "postgresql.conf"
   blockinfile:
-    dest: /etc/postgresql/{{ version }}/main/server.conf
+    dest: /etc/postgresql/{{ version }}/main/postgresql.conf
     block: |
       include 'server.conf'
 
