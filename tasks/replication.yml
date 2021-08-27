@@ -7,17 +7,6 @@
   set_fact:
     slave_address: "{{ groups['slave'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list }}"
 
-- name: Create replica user in the database
-  postgresql_user:
-    db: postgres
-    name: "{{ replica_user }}"
-    password: "{{ replica_pass }}"
-    role_attr_flags: REPLICATION
-  when:
-    - inventory_hostname in groups['master']
-  become: true
-  become_user: postgres
-
 - name: Update configuration to "server.conf"
   blockinfile:
     dest: /etc/postgresql/{{ version }}/main/server.conf
@@ -50,6 +39,17 @@
   when:
     - inventory_hostname in groups['master']
 
+- name: Create replica user in the database
+  postgresql_user:
+    db: postgres
+    name: "{{ replica_user }}"
+    password: "{{ replica_pass }}"
+    role_attr_flags: REPLICATION
+  when:
+    - inventory_hostname in groups['master']
+  become: true
+  become_user: postgres
+
 - name: Make Backup of Postgres Conf
   command: mv main/ main-bkp
   args:
@@ -60,6 +60,8 @@
 - name: execute base backup
   shell: export PGPASSWORD="{{ replica_pass }}" && /usr/bin/pg_basebackup -h {{ master_address }} -U {{ replica_user }} -D /var/lib/postgresql/{{ version }}/main -P -v -R 2>&1
   become_user: postgres
+  when:
+    - inventory_hostname in groups['slave']
 
 - name: Change Permission
   file:
