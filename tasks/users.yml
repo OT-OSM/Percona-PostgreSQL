@@ -5,8 +5,21 @@
   postgresql_user:
     name: "{{ item.name }}"
     password: "{{ item.password }}"
-    priv: "{{ item.priv }}"
-    encrypted: true
+  with_items:
+    - "{{ psql_users }}"
+  tags:
+    - create_user
+  when:
+    - inventory_hostname not in groups['slave']
+
+- name: Ensure we have access from the new user
+  become: yes
+  become_user: postgres
+  postgresql_privs:
+    db: "{{ item.db }}"
+    role: "{{ item.name }}"
+    objs: ALL_IN_SCHEMA
+    privs: SELECT,INSERT,UPDATE,DELETE
   with_items:
     - "{{ psql_users }}"
   tags:
