@@ -31,8 +31,12 @@
 - name: Including tasks for database creation
   include_tasks: database.yml
   when: database_creation
+  tags:
+    - create_database
 
 - name: Including tasks for user_creation
   include_tasks: users.yml
   when: users_creation
+  tags:
+    - create_user
 
