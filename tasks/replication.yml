@@ -30,7 +30,7 @@
   when:
     - inventory_hostname in groups['master']
 
-- name: Create replica user in the database
+- name: Create replica user in postgres master
   postgresql_user:
     db: postgres
     name: "{{ replica_user }}"
@@ -41,20 +41,20 @@
   become: true
   become_user: postgres
 
-- name: Make Backup of Postgres Conf
+- name: Make Backup of Postgres Config on slave
   command: mv main/ main-bkp
   args:
     chdir: /var/lib/postgresql/{{ version }}
   when:
     - inventory_hostname in groups['slave']
 
-- name: execute base backup
+- name: Add master backup on slavve
   shell: export PGPASSWORD="{{ replica_pass }}" && /usr/bin/pg_basebackup -h {{ master_address }} -U {{ replica_user }} -D /var/lib/postgresql/{{ version }}/main -P -v -R 2>&1
   become_user: postgres
   when:
     - inventory_hostname in groups['slave']
 
-- name: Change Permission
+- name: Change Permission of config on slave
   file:
     path:  /var/lib/postgresql/{{ version }}/main/
     owner: postgres

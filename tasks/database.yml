@@ -1,12 +1,12 @@
 ---
-- name: create a db
+- name: Create Database in Postgres
   postgresql_db:
     name: "{{ item.name }}"
     lc_collate: "{{ item.lc_collate | default('en_US.UTF-8') }}"
     lc_ctype: "{{ item.lc_ctype | default('en_US.UTF-8') }}"
     encoding: "{{ item.encoding | default('UTF-8') }}"
     template: "{{ item.template | default('template0') }}"
-    conn_limit: "{{ item.conn_limit | default(10)}}"
+    conn_limit: "{{ item.conn_limit | default(10) }}"
     owner: "{{ item.owner | default('postgres') }}"
     port: "{{ postgres_port }}"
     state: "{{ item.state | default('present') }}"
