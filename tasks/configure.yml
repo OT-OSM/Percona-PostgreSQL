@@ -1,4 +1,12 @@
 ---
+- name: Configure postgres port.
+  lineinfile:
+    dest: "/etc/postgresql/{{ version }}/main/postgresql.conf"
+    regexp: "^#?port.+$"
+    line: "port = '{{ postgres_port }}'"
+    state: present
+    mode: 0644
+
 - name: Add new configuration to "postgresql.conf"
   blockinfile:
     dest: /etc/postgresql/{{ version }}/main/postgresql.conf

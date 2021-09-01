@@ -23,15 +23,6 @@
   when:
     - inventory_hostname in groups['master']
 
-#- name: Add Slave details in Master
-#  lineinfile:
-#    path: /etc/postgresql/{{ version }}/main/pg_hba.conf
-#    insertafter: 'EOF'
-#    line: 'host    replication  {{ replica_user }}  "{{ item }}"   md5'
-#  with_items: "{{ slave_address }}"
-#  when:
-#    - inventory_hostname in groups['master']
-
 - name: Restart postgresql
   service:
     name: postgresql

@@ -1,5 +1,4 @@
 ---
-version: 11
 debian_package:
   - acl
   - percona-postgresql-{{ version }}
@@ -7,6 +6,3 @@ debian_package:
   - percona-patroni
   - percona-pg-stat-monitor{{ version }}
   - percona-postgresql-contrib
-replication: true
-users_creation: true
-database_creation: true
