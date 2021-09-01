@@ -4,24 +4,31 @@
   become_user: postgres
   postgresql_user:
     name: "{{ item.name }}"
-    password: "{{ item.password }}"
+    password: "{{ item.password | default(omit) }}"
+    port: "{{ postgres_port }}"
   with_items:
     - "{{ psql_users }}"
+  no_log: true
   tags:
     - create_user
   when:
     - inventory_hostname not in groups['slave']
 
-- name: Ensure we have access from the new user
+- name: Ensure users in Postgres are configured
   become: yes
   become_user: postgres
-  postgresql_privs:
-    db: "{{ item.db }}"
-    role: "{{ item.name }}"
-    objs: ALL_IN_SCHEMA
-    privs: SELECT,INSERT,UPDATE,DELETE
+  postgresql_user:
+    name: "{{ item.name }}"
+    password: "{{ item.password | default(omit) }}"
+    encrypted: "{{ item.encrypted | default(omit) }}"
+    priv: "{{ item.priv | default(omit) }}"
+    role_attr_flags: "{{ item.role_attr_flags | default(omit) }}"
+    db: "{{ item.db | default(omit) }}"
+    port: "{{ postgres_port }}"
+    state: "{{ item.state | default('present') }}"
   with_items:
     - "{{ psql_users }}"
+  no_log: true
   tags:
     - create_user
   when:
