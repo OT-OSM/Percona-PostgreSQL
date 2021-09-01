@@ -15,7 +15,7 @@
 
 - name: Add new configuration to "server.conf"
   blockinfile:
-    create: yes
+    create: true
     owner: postgres
     group: postgres
     mode: 0644

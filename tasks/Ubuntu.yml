@@ -1,13 +1,13 @@
 ---
 - name: "Update apt cache"
   apt:
-    update_cache: yes
+    update_cache: true
     cache_valid_time: 300
 
 - name: Add Percona Repository
   apt:
-    autoremove: yes
-    update_cache: yes
+    autoremove: true
+    update_cache: true
     deb: https://repo.percona.com/apt/percona-release_latest.{{ ansible_lsb.codename }}_all.deb
     state: present
 
