@@ -88,10 +88,10 @@ ansible-playbook -i hosts site.yml --tags "create_user"
 ansible-playbook -i hosts site.yml --tags "create_database"
 ```
 
-License
+Future Proposed Changesense
 -------
+- Enable Failover in cluster configuration
 
-BSD
 
 Author Information
 ------------------
