@@ -51,6 +51,7 @@
 - name: Add master backup on slavve
   shell: export PGPASSWORD="{{ replica_pass }}" && /usr/bin/pg_basebackup -h {{ master_address }} -U {{ replica_user }} -D /var/lib/postgresql/{{ version }}/main -P -v -R 2>&1
   become_user: postgres
+  become: true
   when:
     - inventory_hostname in groups['slave']
 
