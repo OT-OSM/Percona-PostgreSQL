@@ -34,6 +34,8 @@ The role variables are defined in the [vars](./defaults/main.yml). Here is the l
 |postgres_port |Define Address when want to setup standalone|
 | users_creation | Set true when want to create user|
 | database_creation| Set true when want to create database|
+| psql_databases | List of db creation details|
+| psql_users | List of user creation details|
 | replication | Set true for cluster configuration|
 | replica_user| User of the postgreSQL|
 | replica_pass | Group of the postgreSQL |
