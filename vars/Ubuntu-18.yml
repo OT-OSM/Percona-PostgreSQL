@@ -1,0 +1,7 @@
+---
+debian_package:
+  - percona-postgresql-{{ version }}
+  - percona-postgresql-{{ version }}-pgaudit
+  - percona-patroni
+  - percona-pg-stat-monitor{{ version }}
+  - percona-postgresql-contrib

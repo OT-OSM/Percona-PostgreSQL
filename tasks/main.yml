@@ -1,0 +1,41 @@
+---
+####################### #
+# Postgres Installation #
+####################### #
+- name: Gather OS specific variables
+  include_vars: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_distribution }}.yml"
+
+- name: Including tasks for Installation of Postgres
+  include_tasks: "{{ ansible_distribution }}.yml"
+
+#########################
+# Configure Postgres #
+#########################
+- name: Including tasks for Configuration on Postgres
+  include_tasks: "configure.yml"
+
+# ################################ #
+# Cluster Configurtion In Postgres #
+# ################################ #
+
+- name: Including tasks to Replication Setup
+  include_tasks: replication.yml
+  when: replication
+
+# ###################################### #
+# Database and User Creation In Postgres #
+# ###################################### #
+- name: Including tasks for Database creation
+  include_tasks: database.yml
+  when: database_creation
+  tags:
+    - create_database
+
+- name: Including tasks for User creation
+  include_tasks: users.yml
+  when: users_creation
+  tags:
+    - create_user

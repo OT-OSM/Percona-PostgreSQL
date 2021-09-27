@@ -1,0 +1,29 @@
+---
+- name: Configure Postgres Port
+  lineinfile:
+    dest: "/etc/postgresql/{{ version }}/main/postgresql.conf"
+    regexp: "^#?port.+$"
+    line: "port = '{{ postgres_port }}'"
+    state: present
+    mode: 0644
+
+- name: Add new configuration in postgresql
+  blockinfile:
+    dest: /etc/postgresql/{{ version }}/main/postgresql.conf
+    block: |
+      include 'server.conf'
+
+- name: Add new configuration to "server.conf"
+  blockinfile:
+    create: true
+    owner: postgres
+    group: postgres
+    mode: 0644
+    dest: /etc/postgresql/{{ version }}/main/server.conf
+    block: |
+      listen_addresses = '{{ postgres_listen_addresses }}'
+
+- name: Restart postgresql
+  service:
+    name: postgresql
+    state: restarted

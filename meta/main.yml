@@ -1,0 +1,28 @@
+galaxy_info:
+  role_name: percona_postgresql
+  namespace: opstree_devops
+  author: Abhishek Vishwakarma
+  description: Install and configure Postgresql
+  company: Opstree Solutions
+
+  license: GPLv3
+
+  min_ansible_version: 2.9
+
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal
+        - bionic
+
+  galaxy_tags:
+    - opstree
+    - otosm
+    - psql
+    - percona
+    - postgresql
+    - database
+    - devsecops
+    - devops
+
+dependencies: []

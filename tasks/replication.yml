@@ -1,0 +1,71 @@
+---
+- name: Setting facts for master
+  set_fact:
+    master_address: "{{ hostvars[groups['master'][0]].ipv4_address|default(hostvars[groups['master'][0]]['ansible_default_ipv4']['address']) }}"
+
+- name: Setting facts for slave
+  set_fact:
+    slave_address: "{{ groups['slave'] | map('extract', hostvars, ['ansible_default_ipv4', 'address']) | list }}"
+
+- name: Update configuration to "server.conf"
+  blockinfile:
+    dest: /etc/postgresql/{{ version }}/main/server.conf
+    block: |
+      listen_addresses = '{{ ansible_default_ipv4.address }}'
+
+- name: Add new configuration to "pg_hba.conf"
+  blockinfile:
+    dest: /etc/postgresql/{{ version }}/main/pg_hba.conf
+    block: |
+      host    all             all                      0.0.0.0/0                md5
+      host    replication     {{ replica_user }}       {{ item }}/32            md5
+  with_items: "{{ slave_address }}"
+  when:
+    - inventory_hostname in groups['master']
+
+- name: Restart postgresql
+  service:
+    name: postgresql
+    state: restarted
+  when:
+    - inventory_hostname in groups['master']
+
+- name: Create replica user in postgres master
+  postgresql_user:
+    db: postgres
+    name: "{{ replica_user }}"
+    password: "{{ replica_pass }}"
+    role_attr_flags: REPLICATION
+  when:
+    - inventory_hostname in groups['master']
+  become: true
+  become_user: postgres
+
+- name: Make Backup of Postgres Config on slave
+  command: mv main/ main-bkp
+  args:
+    chdir: /var/lib/postgresql/{{ version }}
+  when:
+    - inventory_hostname in groups['slave']
+
+- name: Add master backup on slavve
+  shell: export PGPASSWORD="{{ replica_pass }}" && /usr/bin/pg_basebackup -h {{ master_address }} -U {{ replica_user }} -D /var/lib/postgresql/{{ version }}/main -P -v -R 2>&1
+  become_user: postgres
+  become: true
+  when:
+    - inventory_hostname in groups['slave']
+
+- name: Change Permission of config on slave
+  file:
+    path: /var/lib/postgresql/{{ version }}/main/
+    owner: postgres
+    group: postgres
+    mode: 0700
+    state: directory
+
+- name: Restart postgresql
+  service:
+    name: postgresql
+    state: restarted
+  when:
+    - inventory_hostname in groups['slave']
