@@ -1,41 +1,47 @@
 ---
-####################### #
-# Postgres Installation #
-####################### #
-- name: Gather OS specific variables
-  include_vars: "{{ item }}"
+#######################
+# Load OS specific vars
+#######################
+- name: Load OS specific variables
+  include_vars:
+    file: "{{ item }}"
   with_first_found:
     - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
     - "{{ ansible_distribution }}.yml"
+  vars:
+    ansible_search_path:
+      - "{{ role_path }}/vars"
 
-- name: Including tasks for Installation of Postgres
+#######################
+# OS-specific install
+#######################
+- name: Include OS-specific installation tasks
   include_tasks: "{{ ansible_distribution }}.yml"
 
-#########################
-# Configure Postgres #
-#########################
-- name: Including tasks for Configuration on Postgres
-  include_tasks: "configure.yml"
+#######################
+# PostgreSQL config
+#######################
+- name: Configure PostgreSQL
+  include_tasks: configure.yml
 
-# ################################ #
-# Cluster Configurtion In Postgres #
-# ################################ #
-
-- name: Including tasks to Replication Setup
+#######################
+# Replication
+#######################
+- name: Replication setup
   include_tasks: replication.yml
-  when: replication
+  when: replication | default(false)
 
-# ###################################### #
-# Database and User Creation In Postgres #
-# ###################################### #
-- name: Including tasks for Database creation
+#######################
+# DB + User management
+#######################
+- name: Database creation
   include_tasks: database.yml
-  when: database_creation
+  when: database_creation | default(false)
   tags:
     - create_database
 
-- name: Including tasks for User creation
+- name: User creation
   include_tasks: users.yml
-  when: users_creation
+  when: users_creation | default(false)
   tags:
     - create_user

@@ -1,5 +1,5 @@
 ---
-version: 11
+version: 16
 
 # Postgres connection settings.
 postgres_port: 5432
@@ -7,6 +7,7 @@ postgres_listen_addresses: localhost
 
 # Databases.
 database_creation: true
+postgres_admin_password: "StrongPasswordHere"
 psql_databases:
   - name: appdb
 #   lc_collate: # defaults to 'en_US.UTF-8'
