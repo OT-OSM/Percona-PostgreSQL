@@ -1,0 +1,40 @@
+---
+# CIS 2.1 – postgres user umask
+- name: CIS | Set postgres umask to 077
+  lineinfile:
+    path: /var/lib/postgresql/.profile
+    line: "umask 077"
+    create: yes
+    owner: postgres
+    group: postgres
+    mode: '0600'
+  tags: [cis, cis_permissions]
+
+# CIS 2.2 – data directory permissions
+- name: CIS | Secure PostgreSQL data directory
+  file:
+    path: "/var/lib/postgresql/{{ version }}/main"
+    owner: postgres
+    group: postgres
+    mode: '0700'
+    recurse: yes
+  tags: [cis, cis_permissions]
+
+# CIS 2.3 – config directory permissions
+- name: CIS | Secure PostgreSQL config directory
+  file:
+    path: "/etc/postgresql/{{ version }}/main"
+    owner: postgres
+    group: postgres
+    mode: '0750'
+    recurse: yes
+  tags: [cis, cis_permissions]
+
+# CIS 2.4 – pg_hba.conf permissions
+- name: CIS | Secure pg_hba.conf
+  file:
+    path: "/etc/postgresql/{{ version }}/main/pg_hba.conf"
+    owner: postgres
+    group: postgres
+    mode: '0600'
+  tags: [cis, cis_permissions]

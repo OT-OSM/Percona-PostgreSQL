@@ -1,0 +1,32 @@
+---
+# CIS 3.2 – Configure pgAudit preload (REQUIRED BEFORE EXTENSION)
+
+- name: CIS | Configure pgAudit preload settings
+  blockinfile:
+    path: /etc/postgresql/{{ version }}/main/server.conf
+    block: |
+      shared_preload_libraries = 'pgaudit'
+      pgaudit.log = 'role,read,write,ddl'
+    owner: postgres
+    group: postgres
+    mode: '0644'
+  notify: Restart postgresql
+  tags: [cis, cis_extensions]
+
+# CIS 3.2 – Restart PostgreSQL to load pgAudit
+- name: CIS | Restart PostgreSQL for pgAudit
+  service:
+    name: postgresql
+    state: restarted
+  tags: [cis, cis_extensions]
+
+# CIS 3.2 – Enable pgAudit extension
+- name: CIS | Enable pgAudit extension
+  community.postgresql.postgresql_ext:
+    name: pgaudit
+    db: postgres
+    state: present
+    login_user: "{{ postgres_admin_user }}"
+    login_password: "{{ postgres_admin_password }}"
+    port: "{{ postgres_port }}"
+  tags: [cis, cis_extensions]

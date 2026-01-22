@@ -1,0 +1,28 @@
+---
+# CIS 3.1 – Enable logging collector
+- name: CIS | Configure PostgreSQL logging
+  blockinfile:
+    path: /etc/postgresql/{{ version }}/main/server.conf
+    block: |
+      logging_collector = on
+      log_destination = 'csvlog'
+      log_directory = '/var/log/postgresql'
+      log_filename = 'postgresql-%Y%m%d.log'
+      log_truncate_on_rotation = on
+      log_rotation_age = 1d
+      log_file_mode = 0600
+      log_connections = on
+      log_disconnections = on
+      log_error_verbosity = default
+      log_line_prefix = '%m [%p] %u %d %r '
+  notify: Restart postgresql
+  tags: [cis, cis_logging]
+
+# CIS 3.2 – Log directory permissions
+- name: CIS | Secure PostgreSQL log directory
+  file:
+    path: /var/log/postgresql
+    owner: postgres
+    group: postgres
+    mode: '0700'
+  tags: [cis, cis_logging]

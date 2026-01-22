@@ -52,7 +52,7 @@
   lineinfile:
     path: /etc/postgresql/{{ version }}/main/pg_hba.conf
     regexp: '^local\s+all\s+postgres\s+'
-    line: 'local   all             postgres                                peer'
+    line: 'local   all             postgres                                md5'
     backup: yes
   # Run this to ensure we can connect as postgres user without password
 

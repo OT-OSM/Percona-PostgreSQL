@@ -1,0 +1,30 @@
+---
+- name: CIS | Install level checks
+  import_tasks: cis_install.yml
+  tags:
+    - cis
+    - cis_install
+
+- name: CIS | File & directory permissions
+  import_tasks: cis_permissions.yml
+  tags:
+    - cis
+    - cis_permissions
+
+- name: CIS | Authentication & access hardening
+  import_tasks: cis_auth.yml
+  tags:
+    - cis
+    - cis_auth
+
+- name: CIS | Logging & auditing
+  import_tasks: cis_logging.yml
+  tags:
+    - cis
+    - cis_logging
+
+- name: CIS | Extensions (pgAudit)
+  import_tasks: cis_extensions.yml
+  tags:
+    - cis
+    - cis_extensions

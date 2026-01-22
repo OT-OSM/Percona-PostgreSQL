@@ -24,6 +24,13 @@
 - name: Configure PostgreSQL
   include_tasks: configure.yml
 
+###########################
+# PostgreSQL cis hardening
+###########################
+- name: Apply CIS PostgreSQL hardening
+  import_tasks: cis/main.yml
+  tags: cis
+
 #######################
 # Replication
 #######################
