@@ -23,10 +23,19 @@
     db: postgres
     login_user: "{{ postgres_admin_user }}"
     login_password: "{{ postgres_admin_password }}"
+    login_host: 127.0.0.1
     port: "{{ postgres_port }}"
     query: |
       SELECT rolname FROM pg_roles
       WHERE rolsuper = true AND rolname != 'postgres';
   register: superusers
-  failed_when: superusers.rowcount > 0
+  failed_when:
+  - superusers is defined
+  - superusers.rowcount | default(0) > 0
+  tags: [cis, cis_auth]
+
+- name: CIS | Ensure PostgreSQL restarted after auth changes
+  service:
+    name: postgresql
+    state: restarted
   tags: [cis, cis_auth]
