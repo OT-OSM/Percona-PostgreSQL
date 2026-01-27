@@ -1,0 +1,16 @@
+---
+- name: Install pgvector package
+  apt:
+    name: postgresql-{{ version }}-pgvector
+    state: present
+    update_cache: yes
+
+- name: Enable pgvector extension
+  community.postgresql.postgresql_ext:
+    name: vector
+    db: postgres
+    state: present
+    login_user: postgres
+    login_password: "{{ postgres_admin_password }}"
+    login_host: 127.0.0.1
+    port: "{{ postgres_port }}"

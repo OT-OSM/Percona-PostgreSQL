@@ -1,4 +1,3 @@
----
 #######################
 # Load OS specific vars
 #######################
@@ -19,13 +18,23 @@
   include_tasks: "{{ ansible_distribution }}.yml"
 
 #######################
-# PostgreSQL config
+# PostgreSQL base config
 #######################
 - name: Configure PostgreSQL
   include_tasks: configure.yml
 
+#######################
+# PostgreSQL extensions
+#######################
+- name: PostgreSQL extensions
+  include_tasks: extensions/pgvector.yml
+  when: pgvector_enabled
+  tags:
+    - extensions
+    - pgvector
+
 ###########################
-# PostgreSQL cis hardening
+# PostgreSQL CIS hardening
 ###########################
 - name: Apply CIS PostgreSQL hardening
   import_tasks: cis/main.yml
