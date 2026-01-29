@@ -15,7 +15,6 @@
     state: restarted
   tags: [cis, cis_extensions]
 
-# TEMPORARILY allow peer
 - name: CIS | Temporarily allow peer auth for postgres
   lineinfile:
     path: /etc/postgresql/{{ version }}/main/pg_hba.conf
@@ -24,10 +23,8 @@
   notify: Restart postgresql
   tags: [cis, cis_extensions]
 
-# 🔥 CRITICAL FIX — apply peer NOW
 - meta: flush_handlers
 
-# Now peer is ACTIVE
 - name: CIS | Reassert postgres password via peer socket
   become: true
   become_user: postgres
