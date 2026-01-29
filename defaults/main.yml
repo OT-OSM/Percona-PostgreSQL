@@ -38,3 +38,7 @@ psql_users:
 replication: false
 replica_user: replicant
 replica_pass: Rep@1234
+
+# pgvector settings
+pgvector_enabled: true
+pgvector_version: "0.6.0"

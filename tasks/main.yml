@@ -28,7 +28,7 @@
 #######################
 - name: PostgreSQL extensions
   include_tasks: extensions/pgvector.yml
-  when: pgvector_enabled
+  when: pgvector_enabled | default(false)
   tags:
     - extensions
     - pgvector
