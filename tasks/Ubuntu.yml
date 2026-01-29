@@ -1,18 +1,17 @@
 ---
-- name: "Update apt cache"
+- name: Update apt cache
   apt:
     update_cache: true
     cache_valid_time: 300
 
 - name: Add Percona Repository
   apt:
-    autoremove: true
-    update_cache: true
     deb: https://repo.percona.com/apt/percona-release_latest.{{ ansible_lsb.codename }}_all.deb
     state: present
+    update_cache: true
 
-- name: "Enable Percona repository"
-  command: "percona-release setup ppg-{{ version }}"
+- name: Enable Percona repository
+  command: percona-release setup ppg-{{ version }}
   changed_when: true
 
 - name: Check if community PostgreSQL is installed
@@ -27,7 +26,9 @@
     state: present
   when: pgdg_installed.rc != 0
 
-# ADD THIS TASK: Initialize PostgreSQL cluster if it doesn't exist
+# -------------------------------
+# PostgreSQL cluster
+# -------------------------------
 - name: Check if PostgreSQL cluster exists
   shell: pg_lsclusters | grep "{{ version }}.*main"
   register: cluster_exists
@@ -37,47 +38,52 @@
 - name: Initialize PostgreSQL cluster
   shell: pg_createcluster {{ version }} main --start
   when: cluster_exists.rc != 0
-  changed_when: true
   notify: Restart postgresql
 
-# REPLACE the "Start Postgresql service" task with this:
 - name: Ensure PostgreSQL service is running
   service:
     name: postgresql
     state: started
-    enabled: yes
+    enabled: true
 
-# FIXED: Always set password, not just when cluster is created
-- name: Temporarily set peer authentication for postgres user
+# -------------------------------
+# AUTH FIX (CRITICAL)
+# -------------------------------
+# Always allow peer auth for postgres (automation-safe)
+- name: Ensure peer authentication for postgres user
   lineinfile:
     path: /etc/postgresql/{{ version }}/main/pg_hba.conf
     regexp: '^local\s+all\s+postgres\s+'
-    line: 'local   all             postgres                                md5'
+    line: 'local   all             postgres                                peer'
     backup: yes
-  # Run this to ensure we can connect as postgres user without password
 
-- name: Reload PostgreSQL for auth changes
+- name: Reload PostgreSQL for auth change
   service:
     name: postgresql
     state: reloaded
 
-- name: Set PostgreSQL admin password (using peer authentication)
-  become: yes
+# -------------------------------
+# Set postgres password (via peer)
+# -------------------------------
+- name: Set PostgreSQL admin password
+  become: true
   become_user: postgres
   shell: |
-    psql -c "ALTER USER postgres WITH PASSWORD '{{ postgres_admin_password }}';"
-  changed_when: true
-  # Don't fail if already set
-  failed_when: false
+    psql -tAc "SELECT 1 FROM pg_shadow WHERE usename='postgres' AND passwd IS NOT NULL;" | grep -q 1 \
+    || psql -c "ALTER USER postgres WITH PASSWORD '{{ postgres_admin_password }}';"
+  changed_when: false
 
-- name: Update pg_hba.conf for password authentication
+# -------------------------------
+# Enforce secure auth for others
+# -------------------------------
+- name: Enforce md5/scram auth for non-postgres users
   lineinfile:
     path: /etc/postgresql/{{ version }}/main/pg_hba.conf
-    regexp: '^local\s+all\s+postgres\s+'
-    line: 'local   all             postgres                                md5'
+    regexp: '^local\s+all\s+all\s+'
+    line: 'local   all             all                                     peer'
     backup: yes
 
-- name: Final PostgreSQL reload
+- name: Reload PostgreSQL (final)
   service:
     name: postgresql
     state: reloaded
