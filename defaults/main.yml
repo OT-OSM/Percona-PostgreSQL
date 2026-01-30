@@ -9,7 +9,7 @@ postgres_listen_addresses: localhost
 database_creation: true
 postgres_admin_password: "StrongPasswordHere"
 psql_databases:
-  - name: appdb
+  - name: sms
 #   lc_collate: # defaults to 'en_US.UTF-8'
 #   lc_ctype: # defaults to 'en_US.UTF-8'
 #   encoding: # defaults to 'UTF-8'
@@ -22,14 +22,14 @@ psql_databases:
 users_creation: true
 
 psql_users:
-  - name: appuser
-    password: AppUser#Secret@123
+  - name: sms@user
+    password: smsuser#Secret@123
 #   priv: # defaults to not set
 #   role_attr_flags: # defaults to not set
-    db: "appdb"
+    db: "sms"
 #   state: # defaults to 'present'
-  - name: monitoring
-    password: Monitoring#Secret@123
+#  - name: monitoring
+#    password: Monitoring#Secret@123
 #   priv: # defaults to not set
 #   db: # defaults to not set
 
