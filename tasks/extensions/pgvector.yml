@@ -1,16 +1,33 @@
 ---
-- name: Install pgvector package
-  apt:
-    name: postgresql-{{ version }}-pgvector
-    state: present
-    update_cache: yes
+- name: Enable pgvector extension on existing PostgreSQL
+  hosts: db_host
+  become: yes
+  vars:
+    db_host: "192.168.8.79"
+    db_port: "5432"
+    db_name: "rems_rca_metadata"
+    db_user: "rems_user"
+    db_pass: "opstreeremsserver"
+    postgresql_extensions:
+      - name: pgvector
+        db: "{{ db_name }}"
 
-- name: Enable pgvector extension
-  become: true
-  become_user: postgres
-  community.postgresql.postgresql_ext:
-    name: vector
-    db: postgres
-    state: present
-    login_user: postgres
-    login_unix_socket: /var/run/postgresql
+  tasks:
+    - name: Install pgvector package (if not installed)
+      apt:
+        name: postgresql-16-pgvector  # adjust version as needed
+        state: present
+        update_cache: yes
+
+    - name: Enable pgvector extension
+      community.postgresql.postgresql_ext:
+        db: "{{ db_name }}"
+        name: pgvector
+        state: present
+        login_host: "{{ db_host }}"
+        login_user: "{{ db_user }}"
+        login_password: "{{ db_pass }}"
+        login_port: "{{ db_port }}"
+      tags:
+        - extensions
+        - pgvector
