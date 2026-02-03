@@ -1,11 +1,27 @@
 ---
-- name: Install pgvector package
+- name: Install required packages
   apt:
     name:
       - python3-psycopg2
-      - postgresql-{{version}}-pgvector
+      - postgresql-16-pgvector
     state: present
     update_cache: yes
+  tags:
+    - extensions
+    - pgvector
+
+- name: Reload PostgreSQL to load new extension
+  service:
+    name: postgresql
+    state: reloaded
+  tags:
+    - extensions
+    - pgvector
+
+- name: Wait for PostgreSQL to be ready
+  wait_for:
+    port: 5432
+    delay: 3
   tags:
     - extensions
     - pgvector
