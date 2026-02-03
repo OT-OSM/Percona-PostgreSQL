@@ -1,42 +1,16 @@
 ---
-- name: Install required packages
+- name: Install pgvector package
   apt:
-    name:
-      - python3-psycopg2
-      - postgresql-16-pgvector
+    name: postgresql-{{ version }}-pgvector
     state: present
     update_cache: yes
-  tags:
-    - extensions
-    - pgvector
 
-- name: Reload PostgreSQL service
-  service:
-    name: postgresql
-    state: reloaded
-  tags:
-    - extensions
-    - pgvector
-
-- name: Enable pgvector extension via psql
-  shell: |
-    sudo -u postgres psql -d "{{ db_name }}" -c "CREATE EXTENSION IF NOT EXISTS pgvector;"
-  tags:
-    - extensions
-    - pgvector
-
-- name: Verify extension
-  shell: |
-    sudo -u postgres psql -d "{{ db_name }}" -t -c "SELECT extname FROM pg_extension WHERE extname = 'pgvector';"
-  register: verify
-  changed_when: false
-  tags:
-    - extensions
-    - pgvector
-
-- name: Show verification result
-  debug:
-    msg: "pgvector extension: {{ 'ENABLED' if 'pgvector' in verify.stdout else 'NOT ENABLED' }}"
-  tags:
-    - extensions
-    - pgvector
+- name: Enable pgvector extension
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_ext:
+    name: vector
+    db: postgres
+    state: present
+    login_user: postgres
+    login_unix_socket: /var/run/postgresql
