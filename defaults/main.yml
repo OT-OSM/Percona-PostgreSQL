@@ -1,5 +1,6 @@
 ---
 version: 16
+postgresql_version: "{{ version }}"
 
 # Postgres connection settings.
 postgres_port: 5432
