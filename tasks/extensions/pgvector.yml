@@ -10,7 +10,7 @@
   become_user: postgres
   community.postgresql.postgresql_ext:
     name: vector
-    db: {{db_name}}
+    db: {{ db_name }}
     state: present
     login_user: postgres
     login_unix_socket: /var/run/postgresql
