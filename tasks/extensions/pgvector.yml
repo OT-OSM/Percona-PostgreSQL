@@ -1,7 +1,7 @@
 ---
 - name: Install pgvector package
   apt:
-    name: postgresql-{{ postgresql_version | default('16') }}-pgvector
+    name: postgresql-16-pgvector
     state: present
     update_cache: yes
   tags:
@@ -16,15 +16,25 @@
     - extensions
     - pgvector
 
-- name: Enable pgvector extension
-  community.postgresql.postgresql_ext:
-    name: pgvector
-    db: "{{ db_name }}"
-    state: present
-    login_user: postgres
-    login_unix_socket: /var/run/postgresql
-  become: true
-  become_user: postgres
+- name: Create pgvector extension
+  shell: |
+    sudo -u postgres psql -d rems_rca_metadata -c "CREATE EXTENSION IF NOT EXISTS pgvector;"
+  tags:
+    - extensions
+    - pgvector
+
+- name: Verify extension creation
+  shell: |
+    sudo -u postgres psql -d rems_rca_metadata -t -c "SELECT extname FROM pg_extension WHERE extname = 'pgvector';"
+  register: verify_result
+  changed_when: false
+  tags:
+    - extensions
+    - pgvector
+
+- name: Show verification result
+  debug:
+    msg: "pgvector extension: {{ 'ENABLED' if 'pgvector' in verify_result.stdout else 'NOT ENABLED' }}"
   tags:
     - extensions
     - pgvector
