@@ -1,7 +1,9 @@
 ---
 - name: Install pgvector package
   apt:
-    name: postgresql-{{version}}-pgvector
+    name:
+      - python3-psycopg2
+      - postgresql-{{version}}-pgvector
     state: present
     update_cache: yes
   tags:
