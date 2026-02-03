@@ -3,6 +3,7 @@
   apt:
     name: postgresql-16-pgvector
     state: present
+    force: yes
     update_cache: yes
   tags:
     - extensions
