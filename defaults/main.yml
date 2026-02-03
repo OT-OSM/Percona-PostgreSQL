@@ -42,3 +42,10 @@ replica_pass: Rep@1234
 # pgvector settings
 pgvector_enabled: true
 pgvector_version: "0.6.0"
+
+# pgvector extension settings
+db_host: "192.168.8.79"
+db_port: 5432
+db_name: "rems_rca_metadata"
+db_user: "rems_user"
+db_pass: "opstreeremsserver"
