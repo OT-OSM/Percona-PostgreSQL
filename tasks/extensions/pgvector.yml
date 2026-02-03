@@ -10,7 +10,7 @@
     - extensions
     - pgvector
 
-- name: Reload PostgreSQL to load new extension
+- name: Reload PostgreSQL service
   service:
     name: postgresql
     state: reloaded
@@ -18,23 +18,25 @@
     - extensions
     - pgvector
 
-- name: Wait for PostgreSQL to be ready
-  wait_for:
-    port: 5432
-    delay: 3
+- name: Enable pgvector extension via psql
+  shell: |
+    sudo -u postgres psql -d "{{ db_name }}" -c "CREATE EXTENSION IF NOT EXISTS pgvector;"
   tags:
     - extensions
     - pgvector
 
-- name: Enable pgvector extension
-  community.postgresql.postgresql_ext:
-    db: "{{ db_name }}"
-    name: pgvector
-    state: present
-    login_host: "{{ db_host }}"
-    login_user: "{{ db_user }}"
-    login_password: "{{ db_pass }}"
-    login_port: "{{ db_port }}"
+- name: Verify extension
+  shell: |
+    sudo -u postgres psql -d "{{ db_name }}" -t -c "SELECT extname FROM pg_extension WHERE extname = 'pgvector';"
+  register: verify
+  changed_when: false
+  tags:
+    - extensions
+    - pgvector
+
+- name: Show verification result
+  debug:
+    msg: "pgvector extension: {{ 'ENABLED' if 'pgvector' in verify.stdout else 'NOT ENABLED' }}"
   tags:
     - extensions
     - pgvector
