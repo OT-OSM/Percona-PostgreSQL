@@ -1,2 +1,5 @@
 ---
-# handlers file for osm_percona_postgres
+- name: Restart postgresql
+  service:
+    name: postgresql
+    state: restarted

@@ -1,0 +1,60 @@
+---
+# CIS 3.2 – Configure pgAudit preload
+- name: CIS | Configure pgAudit preload settings
+  blockinfile:
+    path: /etc/postgresql/{{ version }}/main/server.conf
+    block: |
+      shared_preload_libraries = 'pgaudit'
+      pgaudit.log = 'role,read,write,ddl'
+  notify: Restart postgresql
+  tags: [cis, cis_extensions]
+
+- name: CIS | Restart PostgreSQL for pgAudit
+  service:
+    name: postgresql
+    state: restarted
+  tags: [cis, cis_extensions]
+
+- name: CIS | Temporarily allow peer auth for postgres
+  lineinfile:
+    path: /etc/postgresql/{{ version }}/main/pg_hba.conf
+    insertbefore: BOF
+    line: "local   all   postgres   peer"
+  notify: Restart postgresql
+  tags: [cis, cis_extensions]
+
+- meta: flush_handlers
+
+- name: CIS | Reassert postgres password via peer socket
+  become: true
+  become_user: postgres
+  community.postgresql.postgresql_user:
+    name: postgres
+    password: "{{ postgres_admin_password }}"
+    encrypted: true
+    state: present
+    login_unix_socket: /var/run/postgresql
+  tags: [cis, cis_extensions]
+
+# Remove peer again (CIS-compliant)
+- name: CIS | Remove peer auth again after password fix
+  replace:
+    path: /etc/postgresql/{{ version }}/main/pg_hba.conf
+    regexp: '^local\s+all\s+postgres\s+peer'
+    replace: ''
+  notify: Restart postgresql
+  tags: [cis, cis_extensions]
+
+- meta: flush_handlers
+
+# Enable pgAudit (password auth now stable)
+- name: CIS | Enable pgAudit extension
+  community.postgresql.postgresql_ext:
+    name: pgaudit
+    db: postgres
+    state: present
+    login_user: postgres
+    login_password: "{{ postgres_admin_password }}"
+    login_host: 127.0.0.1
+    port: "{{ postgres_port }}"
+  tags: [cis, cis_extensions]

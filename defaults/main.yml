@@ -1,5 +1,6 @@
 ---
-version: 11
+version: 16
+postgresql_version: "{{ version }}"
 
 # Postgres connection settings.
 postgres_port: 5432
@@ -7,8 +8,9 @@ postgres_listen_addresses: localhost
 
 # Databases.
 database_creation: true
+postgres_admin_password: "StrongPasswordHere"
 psql_databases:
-  - name: appdb
+  - name: sms
 #   lc_collate: # defaults to 'en_US.UTF-8'
 #   lc_ctype: # defaults to 'en_US.UTF-8'
 #   encoding: # defaults to 'UTF-8'
@@ -21,14 +23,14 @@ psql_databases:
 users_creation: true
 
 psql_users:
-  - name: appuser
-    password: AppUser#Secret@123
+  - name: sms@user
+    password: smsuser#Secret@123
 #   priv: # defaults to not set
 #   role_attr_flags: # defaults to not set
-    db: "appdb"
+    db: "sms"
 #   state: # defaults to 'present'
-  - name: monitoring
-    password: Monitoring#Secret@123
+#  - name: monitoring
+#    password: Monitoring#Secret@123
 #   priv: # defaults to not set
 #   db: # defaults to not set
 
@@ -37,3 +39,14 @@ psql_users:
 replication: false
 replica_user: replicant
 replica_pass: Rep@1234
+
+# pgvector settings
+pgvector_enabled: true
+pgvector_version: "0.6.0"
+
+# pgvector extension settings
+db_host: "192.168.8.79"
+db_port: 5432
+db_name: "rems_rca_metadata"
+db_user: "rems_user"
+db_pass: "opstreeremsserver"

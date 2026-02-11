@@ -1,0 +1,12 @@
+---
+- name: CIS | Ensure PostgreSQL data directory exists
+  stat:
+    path: "/var/lib/postgresql/{{ version }}/main"
+  register: pg_data_dir
+  tags: [cis, cis_install]
+
+- name: CIS | Fail if PostgreSQL data directory missing
+  fail:
+    msg: "PostgreSQL data directory not found"
+  when: not pg_data_dir.stat.exists
+  tags: [cis, cis_install]

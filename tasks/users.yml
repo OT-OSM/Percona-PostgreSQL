@@ -1,35 +1,24 @@
 ---
-- name: Create users in Postgres
-  become: true
-  become_user: postgres
-  postgresql_user:
+- name: Create / manage PostgreSQL users
+  community.postgresql.postgresql_user:
     name: "{{ item.name }}"
     password: "{{ item.password | default(omit) }}"
-    port: "{{ postgres_port }}"
-  with_items:
-    - "{{ psql_users }}"
-  no_log: true
-  tags:
-    - create_user
-  when:
-    - inventory_hostname not in groups['slave']
-
-- name: Ensure users in Postgres are configured
-  become: true
-  become_user: postgres
-  postgresql_user:
-    name: "{{ item.name }}"
-    password: "{{ item.password | default(omit) }}"
-    encrypted: "{{ item.encrypted | default(omit) }}"
-    priv: "{{ item.priv | default(omit) }}"
+    encrypted: true
     role_attr_flags: "{{ item.role_attr_flags | default(omit) }}"
+    priv: "{{ item.priv | default(omit) }}"
     db: "{{ item.db | default(omit) }}"
-    port: "{{ postgres_port }}"
     state: "{{ item.state | default('present') }}"
-  with_items:
-    - "{{ psql_users }}"
+
+    # IMPORTANT: password auth after CIS
+    login_user: postgres
+    login_password: "{{ postgres_admin_password }}"
+    login_host: 127.0.0.1
+    port: "{{ postgres_port }}"
+
+  loop: "{{ psql_users }}"
   no_log: true
   tags:
     - create_user
+
   when:
-    - inventory_hostname not in groups['slave']
+    - "'slave' not in groups or inventory_hostname not in groups['slave']"
