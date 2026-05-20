@@ -4,6 +4,18 @@
     update_cache: true
     cache_valid_time: 300
 
+- name: Install postgresql-common
+  apt:
+    name: postgresql-common
+    state: present
+    update_cache: yes
+
+- name: Ensure postgresql-common directory exists
+  file:
+    path: /etc/postgresql-common
+    state: directory
+    mode: '0755'
+
 - name: Disable automatic PostgreSQL cluster creation
   copy:
     dest: /etc/postgresql-common/createcluster.conf
