@@ -11,16 +11,16 @@
 
 - name: Install PostgreSQL Packages
   include_tasks: postgres.yml
-  when: inventory_hostname in groups['postgres']
+  when: inventory_hostname in ['192.168.8.19', '192.168.8.20']
 
 - name: Configure etcd
   include_tasks: etcd.yml
-  when: inventory_hostname in groups['etcd']
+  when: inventory_hostname in ['192.168.8.19', '192.168.8.20']
 
 - name: Configure Patroni
   include_tasks: patroni.yml
-  when: inventory_hostname in groups['postgres']
+  when: inventory_hostname in ['192.168.8.19', '192.168.8.20']
 
 - name: Configure HAProxy
   include_tasks: haproxy.yml
-  when: inventory_hostname in groups['haproxy']
+  when: inventory_hostname == '192.168.8.19'
