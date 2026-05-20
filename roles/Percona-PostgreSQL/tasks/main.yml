@@ -1,7 +1,4 @@
 ---
-- name: Gather OS specific variables
-  include_vars: "../vars/Ubuntu-24.yml"
-
 - name: Install PostgreSQL Packages
   include_tasks: postgres.yml
   when: inventory_hostname in ['192.168.8.19', '192.168.8.20']
