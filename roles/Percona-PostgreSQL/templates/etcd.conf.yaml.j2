@@ -1,8 +1,4 @@
-{% if inventory_hostname == '192.168.8.19' %}
 name: etcd1
-{% else %}
-name: etcd2
-{% endif %}
 
 data-dir: /var/lib/etcd/default.etcd
 
@@ -12,7 +8,7 @@ listen-client-urls: http://0.0.0.0:2379
 initial-advertise-peer-urls: http://{{ ansible_host }}:2380
 advertise-client-urls: http://{{ ansible_host }}:2379
 
-initial-cluster: etcd1=http://192.168.8.19:2380,etcd2=http://192.168.8.20:2380
+initial-cluster: etcd1=http://192.168.8.19:2380
 
 initial-cluster-token: etcd-cluster
 
