@@ -1,6 +1,6 @@
 ---
 - name: Gather OS specific variables
-  include_vars:"../vars/Ubuntu-24.yml"
+  include_vars: "../vars/Ubuntu-24.yml"
 
 - name: Install PostgreSQL Packages
   include_tasks: postgres.yml
