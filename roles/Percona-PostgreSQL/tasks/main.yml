@@ -7,7 +7,7 @@
       files:
         - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
       paths:
-        - vars
+        - ../vars
 
 - name: Install PostgreSQL Packages
   include_tasks: postgres.yml
