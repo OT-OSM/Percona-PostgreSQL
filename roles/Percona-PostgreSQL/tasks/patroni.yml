@@ -50,11 +50,11 @@
 
 - name: Wait for etcd health
   uri:
-    url: "http://{{ hostvars[groups['etcd'][0]]['ansible_host'] }}:2379/health"
+    url: "http://192.168.8.19:2379/health"
     method: GET
     status_code: 200
   register: etcd_health
-  retries: 20
+  retries: 10
   delay: 5
   until: etcd_health.status == 200
 
