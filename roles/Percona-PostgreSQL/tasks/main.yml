@@ -1,13 +1,6 @@
 ---
 - name: Gather OS specific variables
-  include_vars:
-    file: "{{ lookup('first_found', params) }}"
-  vars:
-    params:
-      files:
-        - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
-      paths:
-        - ../vars
+  include_vars:"../vars/Ubuntu-24.yml"
 
 - name: Install PostgreSQL Packages
   include_tasks: postgres.yml
