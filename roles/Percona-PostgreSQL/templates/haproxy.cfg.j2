@@ -16,6 +16,4 @@ backend postgres_back
     option httpchk GET /primary
     http-check expect status 200
 
-{% for host in groups['postgres'] %}
-    server {{ host }} {{ hostvars[host]['ansible_host'] }}:5432 check port 8008
-{% endfor %}
+    server pg1 192.168.8.19:5432 check port 8008
