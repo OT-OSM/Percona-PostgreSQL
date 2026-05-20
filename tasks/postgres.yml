@@ -1,0 +1,51 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: true
+    cache_valid_time: 300
+
+- name: Disable automatic PostgreSQL cluster creation
+  copy:
+    dest: /etc/postgresql-common/createcluster.conf
+    content: |
+      create_main_cluster = false
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: Add Percona Repository
+  apt:
+    autoremove: true
+    update_cache: true
+    deb: "https://repo.percona.com/apt/percona-release_latest.{{ ansible_lsb.codename }}_all.deb"
+    state: present
+
+- name: Enable Percona PostgreSQL Repository
+  command: "percona-release setup ppg-{{ version }}"
+  changed_when: true
+
+- name: Install PostgreSQL Packages
+  apt:
+    name:
+      - acl
+      - "percona-postgresql-{{ version }}"
+      - "percona-postgresql-{{ version }}-pgaudit"
+      - percona-patroni
+      - "percona-pg-stat-monitor{{ version }}"
+      - percona-postgresql-contrib
+    state: present
+    update_cache: yes
+
+- name: Stop and disable PostgreSQL service
+  service:
+    name: postgresql
+    state: stopped
+    enabled: false
+  ignore_errors: true
+
+- name: Stop PostgreSQL cluster service
+  service:
+    name: "postgresql@{{ version }}-main"
+    state: stopped
+    enabled: false
+  ignore_errors: true

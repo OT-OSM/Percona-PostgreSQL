@@ -1,2 +1,28 @@
 ---
 # handlers file for osm_percona_postgres
+
+- name: restart etcd
+  service:
+    name: etcd
+    state: restarted
+
+- name: restart patroni
+  service:
+    name: patroni
+    state: restarted
+    enabled: true
+
+- name: start patroni
+  service:
+    name: patroni
+    state: started
+    enabled: true
+
+- name: restart haproxy
+  service:
+    name: haproxy
+    state: restarted
+
+- name: reload systemd
+  systemd:
+    daemon_reload: yes

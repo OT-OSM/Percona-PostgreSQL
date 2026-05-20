@@ -1,41 +1,26 @@
 ---
-####################### #
-# Postgres Installation #
-####################### #
 - name: Gather OS specific variables
-  include_vars: "{{ item }}"
-  with_first_found:
-    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
-    - "{{ ansible_distribution }}.yml"
+  include_vars:
+    file: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+      paths:
+        - vars
 
-- name: Including tasks for Installation of Postgres
-  include_tasks: "{{ ansible_distribution }}.yml"
+- name: Install PostgreSQL Packages
+  include_tasks: postgres.yml
+  when: inventory_hostname in groups['postgres']
 
-#########################
-# Configure Postgres #
-#########################
-- name: Including tasks for Configuration on Postgres
-  include_tasks: "configure.yml"
+- name: Configure etcd
+  include_tasks: etcd.yml
+  when: inventory_hostname in groups['etcd']
 
-# ################################ #
-# Cluster Configurtion In Postgres #
-# ################################ #
+- name: Configure Patroni
+  include_tasks: patroni.yml
+  when: inventory_hostname in groups['postgres']
 
-- name: Including tasks to Replication Setup
-  include_tasks: replication.yml
-  when: replication
-
-# ###################################### #
-# Database and User Creation In Postgres #
-# ###################################### #
-- name: Including tasks for Database creation
-  include_tasks: database.yml
-  when: database_creation
-  tags:
-    - create_database
-
-- name: Including tasks for User creation
-  include_tasks: users.yml
-  when: users_creation
-  tags:
-    - create_user
+- name: Configure HAProxy
+  include_tasks: haproxy.yml
+  when: inventory_hostname in groups['haproxy']

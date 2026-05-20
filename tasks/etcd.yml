@@ -1,0 +1,48 @@
+# ---
+# - name: Install etcd
+#   apt:
+#     name: etcd
+#     state: present
+#     update_cache: yes
+
+# - name: Configure etcd
+#   template:
+#     src: etcd.conf.yaml.j2
+#     dest: /etc/etcd/etcd.conf.yaml
+#     owner: root
+#     group: root
+#     mode: '0644'
+#   notify:
+#     - restart etcd
+
+# - name: Enable etcd
+#   service:
+#     name: etcd
+#     enabled: yes
+
+---
+- name: Install etcd
+  apt:
+    name: etcd
+    state: present
+    update_cache: yes
+
+- name: Remove old etcd data
+  file:
+    path: /var/lib/etcd/default.etcd
+    state: absent
+
+- name: Configure etcd
+  template:
+    src: etcd.conf.yaml.j2
+    dest: /etc/etcd/etcd.conf.yaml
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - restart etcd
+
+- name: Enable etcd
+  service:
+    name: etcd
+    enabled: yes

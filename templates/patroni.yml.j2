@@ -1,0 +1,73 @@
+scope: {{ cluster_name }}
+
+name: {{ inventory_hostname }}
+
+restapi:
+  listen: 0.0.0.0:8008
+  connect_address: {{ ansible_default_ipv4.address }}:8008
+
+etcd3:
+  hosts: {{ etcd_hosts | join(',') }}
+
+bootstrap:
+  method: initdb
+
+  dcs:
+    ttl: 30
+    loop_wait: 10
+    retry_timeout: 10
+
+    postgresql:
+      use_pg_rewind: true
+      use_slots: true
+
+      parameters:
+        wal_level: replica
+        hot_standby: "on"
+        max_wal_senders: 10
+        max_replication_slots: 10
+
+  initdb:
+    - encoding: UTF8
+    - data-checksums
+
+  pg_hba:
+    - local all postgres trust
+    - local all all trust
+    - host replication {{ replica_user }} 0.0.0.0/0 md5
+    - host all all 0.0.0.0/0 md5
+
+  users:
+    admin:
+      password: admin
+      options:
+        - createrole
+        - createdb
+
+postgresql:
+  listen: 0.0.0.0:5432
+
+  connect_address: {{ ansible_default_ipv4.address }}:5432
+
+  data_dir: /var/lib/postgresql/{{ version }}/main
+
+  bin_dir: /usr/lib/postgresql/{{ version }}/bin
+
+  parameters:
+    unix_socket_directories: '/var/run/postgresql'
+
+  pg_hba:
+    - local all postgres trust
+    - local all all trust
+    - host replication {{ replica_user }} 0.0.0.0/0 md5
+    - host all all 0.0.0.0/0 md5
+
+  authentication:
+
+    replication:
+      username: {{ replica_user }}
+      password: {{ replica_pass }}
+
+    superuser:
+      username: postgres
+      password: postgres

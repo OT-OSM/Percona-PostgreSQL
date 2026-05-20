@@ -1,0 +1,20 @@
+global
+    log /dev/log local0
+
+defaults
+    log global
+    mode tcp
+    timeout connect 10s
+    timeout client 1m
+    timeout server 1m
+
+frontend postgres_front
+    bind *:5432
+    default_backend postgres_back
+
+backend postgres_back
+    balance roundrobin
+    option tcp-check
+
+    server pg1 192.168.8.19:5432 check
+    server pg2 192.168.8.20:5432 check

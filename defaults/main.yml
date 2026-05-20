@@ -1,39 +1,33 @@
 ---
-version: 11
+version: 16
 
-# Postgres connection settings.
 postgres_port: 5432
-postgres_listen_addresses: localhost
 
-# Databases.
+cluster_name: postgres-cluster
+
+postgres_listen_addresses: "0.0.0.0"
+
+patroni_rest_port: 8008
+
+replication: true
+
+replica_user: replicator
+replica_pass: Replicator@123
+
+etcd_hosts:
+  - 192.168.8.19:2379
+  - 192.168.8.20:2379
+
+haproxy_port: 5432
+
 database_creation: true
+
+users_creation: true
+
 psql_databases:
   - name: appdb
-#   lc_collate: # defaults to 'en_US.UTF-8'
-#   lc_ctype: # defaults to 'en_US.UTF-8'
-#   encoding: # defaults to 'UTF-8'
-#   template: # defaults to 'template0'
-#   conn_limit: # defauls to 10
-#   owner: # defaults to postgresql_user
-#   state: # defaults to 'present'
-
-# Users.
-users_creation: true
 
 psql_users:
   - name: appuser
-    password: AppUser#Secret@123
-#   priv: # defaults to not set
-#   role_attr_flags: # defaults to not set
-    db: "appdb"
-#   state: # defaults to 'present'
-  - name: monitoring
-    password: Monitoring#Secret@123
-#   priv: # defaults to not set
-#   db: # defaults to not set
-
-
-# Postgres cluster settings.
-replication: false
-replica_user: replicant
-replica_pass: Rep@1234
+    password: AppUser@123
+    db: appdb

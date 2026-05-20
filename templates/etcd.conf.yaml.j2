@@ -1,0 +1,17 @@
+name: etcd1
+
+data-dir: /var/lib/etcd/default.etcd
+
+listen-peer-urls: http://0.0.0.0:2380
+listen-client-urls: http://0.0.0.0:2379
+
+initial-advertise-peer-urls: http://172.31.24.186:2380
+advertise-client-urls: http://172.31.24.186:2379
+
+initial-cluster: etcd1=http://172.31.24.186:2380
+
+initial-cluster-token: etcd-cluster
+
+initial-cluster-state: new
+
+enable-v2: true
