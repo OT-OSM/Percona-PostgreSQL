@@ -9,11 +9,13 @@ defaults
     timeout server 1m
 
 frontend postgres_front
-    bind *:5432
+    bind *:{{ haproxy_port }}
     default_backend postgres_back
 
 backend postgres_back
     option httpchk GET /primary
     http-check expect status 200
 
-    server pg1 192.168.8.20:5432 check port 8008
+{% for host in groups['postgres'] %}
+    server {{ host }} {{ hostvars[host]['ansible_host'] }}:{{ postgres_port }} check port {{ patroni_rest_port }}
+{% endfor %}

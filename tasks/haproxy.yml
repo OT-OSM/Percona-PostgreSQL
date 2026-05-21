@@ -1,0 +1,16 @@
+---
+- name: Install HAProxy
+  ansible.builtin.apt:
+    name: haproxy
+    state: present
+    update_cache: true
+
+- name: Configure HAProxy
+  ansible.builtin.template:
+    src: haproxy.cfg.j2
+    dest: "{{ haproxy_config_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - restart haproxy

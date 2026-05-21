@@ -1,0 +1,50 @@
+---
+version: "16"
+
+cluster_name: "postgres-cluster"
+
+postgres_port: 5432
+
+postgres_listen_addresses: "0.0.0.0"
+
+patroni_rest_port: 8008
+
+etcd_client_port: 2379
+
+etcd_peer_port: 2380
+
+haproxy_port: 5432
+
+replication: true
+
+replica_user: "replicator"
+
+replica_pass: "Replicator@123"
+
+postgres_packages:
+  - acl
+  - "percona-postgresql-{{ version }}"
+  - "percona-postgresql-{{ version }}-pgaudit"
+  - percona-patroni
+  - "percona-pg-stat-monitor{{ version }}"
+  - percona-postgresql-contrib
+
+postgresql_common_path: "/etc/postgresql-common"
+
+createcluster_conf: "/etc/postgresql-common/createcluster.conf"
+
+postgres_data_dir: "/var/lib/postgresql/{{ version }}/main"
+
+postgres_config_dir: "/etc/postgresql/{{ version }}/main"
+
+patroni_config_dir: "/etc/patroni"
+
+patroni_config_path: "/etc/patroni/patroni.yml"
+
+etcd_data_dir: "/var/lib/etcd/default.etcd"
+
+etcd_config_path: "/etc/etcd/etcd.conf.yaml"
+
+haproxy_config_path: "/etc/haproxy/haproxy.cfg"
+
+percona_repo_url: "https://repo.percona.com/apt/percona-release_latest.{{ ansible_lsb.codename }}_all.deb"

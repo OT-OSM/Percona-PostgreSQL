@@ -1,0 +1,26 @@
+---
+- name: Install ETCD
+  ansible.builtin.apt:
+    name: etcd
+    state: present
+    update_cache: true
+
+- name: Remove old ETCD data
+  ansible.builtin.file:
+    path: "{{ etcd_data_dir }}"
+    state: absent
+
+- name: Configure ETCD
+  ansible.builtin.template:
+    src: etcd.conf.yaml.j2
+    dest: "{{ etcd_config_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - restart etcd
+
+- name: Enable ETCD
+  ansible.builtin.service:
+    name: etcd
+    enabled: true

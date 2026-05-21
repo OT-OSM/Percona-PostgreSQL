@@ -3,11 +3,14 @@ scope: {{ cluster_name }}
 name: {{ inventory_hostname }}
 
 restapi:
-  listen: 0.0.0.0:8008
-  connect_address: {{ ansible_default_ipv4.address }}:8008
+  listen: 0.0.0.0:{{ patroni_rest_port }}
+  connect_address: {{ ansible_default_ipv4.address }}:{{ patroni_rest_port }}
 
 etcd3:
-  hosts: {{ etcd_hosts | join(',') }}
+  hosts:
+{% for host in groups['etcd'] %}
+    - {{ hostvars[host]['ansible_host'] }}:{{ etcd_client_port }}
+{% endfor %}
 
 bootstrap:
   method: initdb
@@ -31,39 +34,19 @@ bootstrap:
     - encoding: UTF8
     - data-checksums
 
-  pg_hba:
-    - local all postgres trust
-    - local all all trust
-    - host replication {{ replica_user }} 0.0.0.0/0 md5
-    - host all all 0.0.0.0/0 md5
-
-  users:
-    admin:
-      password: admin
-      options:
-        - createrole
-        - createdb
-
 postgresql:
-  listen: 0.0.0.0:5432
+  listen: 0.0.0.0:{{ postgres_port }}
 
-  connect_address: {{ ansible_default_ipv4.address }}:5432
+  connect_address: {{ ansible_default_ipv4.address }}:{{ postgres_port }}
 
-  data_dir: /var/lib/postgresql/{{ version }}/main
+  data_dir: {{ postgres_data_dir }}
 
   bin_dir: /usr/lib/postgresql/{{ version }}/bin
 
   parameters:
     unix_socket_directories: '/var/run/postgresql'
 
-  pg_hba:
-    - local all postgres trust
-    - local all all trust
-    - host replication {{ replica_user }} 0.0.0.0/0 md5
-    - host all all 0.0.0.0/0 md5
-
   authentication:
-
     replication:
       username: {{ replica_user }}
       password: {{ replica_pass }}

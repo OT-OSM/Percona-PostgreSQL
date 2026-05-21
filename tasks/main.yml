@@ -1,0 +1,26 @@
+---
+- name: Gather OS specific variables
+  ansible.builtin.include_vars:
+    file: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+      paths:
+        - vars
+
+- name: Install PostgreSQL packages
+  ansible.builtin.include_tasks: postgres.yml
+  when: inventory_hostname in groups['postgres']
+
+- name: Configure ETCD
+  ansible.builtin.include_tasks: etcd.yml
+  when: inventory_hostname in groups['etcd']
+
+- name: Configure Patroni
+  ansible.builtin.include_tasks: patroni.yml
+  when: inventory_hostname in groups['postgres']
+
+- name: Configure HAProxy
+  ansible.builtin.include_tasks: haproxy.yml
+  when: inventory_hostname in groups['haproxy']

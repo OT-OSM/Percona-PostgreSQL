@@ -1,28 +1,20 @@
 ---
-# handlers file for osm_percona_postgres
-
 - name: restart etcd
-  service:
+  ansible.builtin.service:
     name: etcd
     state: restarted
 
 - name: restart patroni
-  service:
+  ansible.builtin.service:
     name: patroni
     state: restarted
     enabled: true
 
-- name: start patroni
-  service:
-    name: patroni
-    state: started
-    enabled: true
-
 - name: restart haproxy
-  service:
+  ansible.builtin.service:
     name: haproxy
     state: restarted
 
 - name: reload systemd
-  systemd:
-    daemon_reload: yes
+  ansible.builtin.systemd:
+    daemon_reload: true

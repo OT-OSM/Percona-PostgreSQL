@@ -1,0 +1,55 @@
+---
+- name: Update apt cache
+  ansible.builtin.apt:
+    update_cache: true
+    cache_valid_time: 300
+
+- name: Install PostgreSQL common package
+  ansible.builtin.apt:
+    name: postgresql-common
+    state: present
+
+- name: Ensure postgresql-common directory exists
+  ansible.builtin.file:
+    path: "{{ postgresql_common_path }}"
+    state: directory
+    mode: "0755"
+
+- name: Disable automatic PostgreSQL cluster creation
+  ansible.builtin.copy:
+    dest: "{{ createcluster_conf }}"
+    content: |
+      create_main_cluster = false
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Add Percona repository
+  ansible.builtin.apt:
+    deb: "{{ percona_repo_url }}"
+    state: present
+
+- name: Enable Percona PostgreSQL repository
+  ansible.builtin.command:
+    cmd: "percona-release setup ppg-{{ version }}"
+  changed_when: true
+
+- name: Install PostgreSQL packages
+  ansible.builtin.apt:
+    name: "{{ postgres_packages }}"
+    state: present
+    update_cache: true
+
+- name: Stop PostgreSQL service
+  ansible.builtin.service:
+    name: postgresql
+    state: stopped
+    enabled: false
+  ignore_errors: true
+
+- name: Stop PostgreSQL cluster service
+  ansible.builtin.service:
+    name: "postgresql@{{ version }}-main"
+    state: stopped
+    enabled: false
+  ignore_errors: true
