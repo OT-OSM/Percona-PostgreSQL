@@ -3,6 +3,8 @@ version: "16"
 
 cluster_name: "postgres-cluster"
 
+etcd_master: "192.168.8.19"
+
 postgres_port: 5432
 
 postgres_listen_addresses: "0.0.0.0"
