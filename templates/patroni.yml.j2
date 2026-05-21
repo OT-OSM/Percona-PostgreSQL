@@ -9,7 +9,7 @@ restapi:
 etcd3:
   hosts:
 {% for host in groups['etcd'] %}
-    - {{ hostvars[host]['ansible_host'] }}:{{ etcd_client_port }}
+    - {{ hostvars[host]['inventory_hostname'] }}:{{ etcd_client_port }}
 {% endfor %}
 
 bootstrap:
