@@ -15,7 +15,7 @@
 
 - name: Configure ETCD
   ansible.builtin.include_tasks: etcd.yml
-  when: inventory_hostname in groups['etcd']
+  when: inventory_hostname == groups['etcd'][0]
 
 - name: Configure Patroni
   ansible.builtin.include_tasks: patroni.yml
