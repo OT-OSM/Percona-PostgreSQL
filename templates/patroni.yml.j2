@@ -8,9 +8,7 @@ restapi:
 
 etcd3:
   hosts:
-{% for host in groups['etcd'] %}
-    - {{ hostvars[host]['inventory_hostname'] }}:{{ etcd_client_port }}
-{% endfor %}
+    - {{ groups['etcd'][0] }}:{{ etcd_client_port }}
 
 bootstrap:
   method: initdb
