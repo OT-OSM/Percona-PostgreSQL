@@ -17,5 +17,5 @@ backend postgres_back
     http-check expect status 200
 
 {% for host in groups['postgres'] %}
-    server {{ host }} {{ hostvars[host]['ansible_host'] }}:{{ postgres_port }} check port {{ patroni_rest_port }}
+    server {{ host }} {{ hostvars[host]['inventory_hostname'] }}:{{ postgres_port }} check port {{ patroni_rest_port }}
 {% endfor %}
