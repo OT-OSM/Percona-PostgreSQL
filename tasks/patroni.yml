@@ -55,7 +55,7 @@
 
 - name: Wait for ETCD health
   ansible.builtin.uri:
-    url: "http://{{ hostvars[groups['etcd'][0]]['ansible_host'] }}:{{ etcd_client_port }}/health"
+    url: "http://{{ hostvars[groups['etcd'][0]]['inventory_hostname'] }}:{{ etcd_client_port }}/health"
     method: GET
     status_code: 200
   register: etcd_health
