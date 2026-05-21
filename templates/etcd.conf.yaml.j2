@@ -10,7 +10,7 @@ initial-advertise-peer-urls: http://{{ inventory_hostname }}:{{ etcd_peer_port }
 
 advertise-client-urls: http://{{ inventory_hostname }}:{{ etcd_client_port }}
 
-initial-cluster: {{ groups['etcd'][0] }}=http://{{ groups['etcd'][0] }}:{{ etcd_peer_port }}
+initial-cluster: {{ etcd_master }}=http://{{ etcd_master }}:{{ etcd_peer_port }}
 
 initial-cluster-token: etcd-cluster
 
