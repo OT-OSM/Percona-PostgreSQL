@@ -13,7 +13,7 @@ etcd_client_port: 2379
 
 etcd_peer_port: 2380
 
-haproxy_port: 5432
+haproxy_port: 5000
 
 replication: true
 
