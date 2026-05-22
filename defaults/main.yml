@@ -1,52 +1,62 @@
 ---
-version: "16"
+percona_postgresql_version: "16"
 
-cluster_name: "postgres-cluster"
+percona_postgresql_cluster_name: "postgres-cluster"
 
-etcd_master: "192.168.8.19"
+percona_postgresql_etcd_master: "192.168.8.19"
 
-postgres_port: 5432
+percona_postgresql_port: 5432
 
-postgres_listen_addresses: "0.0.0.0"
+percona_postgresql_listen_addresses: "0.0.0.0"
 
-patroni_rest_port: 8008
+percona_postgresql_patroni_rest_port: 8008
 
-etcd_client_port: 2379
+percona_postgresql_etcd_client_port: 2379
 
-etcd_peer_port: 2380
+percona_postgresql_etcd_peer_port: 2380
 
-haproxy_port: 5000
+percona_postgresql_haproxy_port: 5000
 
-replication: true
+percona_postgresql_replication_enabled: true
 
-replica_user: "replicator"
+percona_postgresql_replica_user: "replicator"
 
-replica_pass: "Replicator@123"
+percona_postgresql_replica_password: "Replicator@123"
 
-postgres_packages:
+percona_postgresql_haproxy_stats_enable: true
+
+percona_postgresql_haproxy_stats_port: 7000
+
+percona_postgresql_haproxy_stats_uri: /
+
+percona_postgresql_haproxy_stats_user: "admin"
+
+percona_postgresql_haproxy_stats_password: "admin123"
+
+percona_postgresql_packages:
   - acl
-  - "percona-postgresql-{{ version }}"
-  - "percona-postgresql-{{ version }}-pgaudit"
+  - "percona-postgresql-{{ percona_postgresql_version }}"
+  - "percona-postgresql-{{ percona_postgresql_version }}-pgaudit"
   - percona-patroni
-  - "percona-pg-stat-monitor{{ version }}"
+  - "percona-pg-stat-monitor{{ percona_postgresql_version }}"
   - percona-postgresql-contrib
 
-postgresql_common_path: "/etc/postgresql-common"
+percona_postgresql_common_path: "/etc/postgresql-common"
 
-createcluster_conf: "/etc/postgresql-common/createcluster.conf"
+percona_postgresql_createcluster_conf: "/etc/postgresql-common/createcluster.conf"
 
-postgres_data_dir: "/var/lib/postgresql/{{ version }}/main"
+percona_postgresql_data_dir: "/var/lib/postgresql/{{ percona_postgresql_version }}/main"
 
-postgres_config_dir: "/etc/postgresql/{{ version }}/main"
+percona_postgresql_config_dir: "/etc/postgresql/{{ percona_postgresql_version }}/main"
 
-patroni_config_dir: "/etc/patroni"
+percona_postgresql_patroni_config_dir: "/etc/patroni"
 
-patroni_config_path: "/etc/patroni/patroni.yml"
+percona_postgresql_patroni_config_path: "/etc/patroni/patroni.yml"
 
-etcd_data_dir: "/var/lib/etcd/default.etcd"
+percona_postgresql_etcd_data_dir: "/var/lib/etcd/default.etcd"
 
-etcd_config_path: "/etc/etcd/etcd.conf.yaml"
+percona_postgresql_etcd_config_path: "/etc/etcd/etcd.conf.yaml"
 
-haproxy_config_path: "/etc/haproxy/haproxy.cfg"
+percona_postgresql_haproxy_config_path: "/etc/haproxy/haproxy.cfg"
 
-percona_repo_url: "https://repo.percona.com/apt/percona-release_latest.{{ ansible_lsb.codename }}_all.deb"
+percona_postgresql_repo_url: "https://repo.percona.com/apt/percona-release_latest.{{ ansible_lsb.codename }}_all.deb"
