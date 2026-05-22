@@ -19,3 +19,16 @@ backend postgres_back
 {% for host in groups['postgres'] %}
     server pg{{ loop.index }} {{ hostvars[host]['inventory_hostname'] }}:{{ postgres_port }} check port {{ patroni_rest_port }}
 {% endfor %}
+
+{% if haproxy_stats_enable %}
+
+listen stats
+    bind *:{{ haproxy_stats_port }}
+    mode http
+    stats enable
+    stats uri {{ haproxy_stats_uri }}
+    stats refresh 10s
+    stats show-node
+    stats auth {{ haproxy_stats_user }}:{{ haproxy_stats_password }}
+
+{% endif %}
