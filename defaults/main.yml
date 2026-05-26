@@ -52,3 +52,13 @@ percona_postgresql_packages:
   - percona-patroni
   - "percona-pg-stat-monitor{{ percona_postgresql_version }}"
   - percona-postgresql-contrib
+
+# PostgreSQL Authentication
+percona_postgresql_replica_user: "replicator"
+percona_postgresql_replica_password: "Replicator@123"
+
+percona_postgresql_superuser_username: "postgres"
+percona_postgresql_superuser_password: "postgres"
+
+percona_postgresql_admin_username: "admin"
+percona_postgresql_admin_password: "admin"

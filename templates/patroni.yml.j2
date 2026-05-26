@@ -1,14 +1,14 @@
-scope: {{ cluster_name }}
+scope: {{ percona_postgresql_cluster_name }}
 
 name: {{ inventory_hostname }}
 
 restapi:
-  listen: 0.0.0.0:{{ patroni_rest_port }}
-  connect_address: {{ inventory_hostname }}:{{ patroni_rest_port }}
+  listen: 0.0.0.0:{{ percona_postgresql_patroni_rest_port }}
+  connect_address: {{ inventory_hostname }}:{{ percona_postgresql_patroni_rest_port }}
 
 etcd3:
   hosts:
-    - {{ etcd_master }}:{{ etcd_client_port }}
+    - {{ percona_postgresql_etcd_host }}:{{ percona_postgresql_etcd_client_port }}
 
 bootstrap:
   method: initdb
@@ -35,24 +35,24 @@ bootstrap:
   pg_hba:
     - local all postgres trust
     - local all all trust
-    - host replication {{ replica_user }} 0.0.0.0/0 md5
+    - host replication {{ percona_postgresql_replica_user }} 0.0.0.0/0 md5
     - host all all 0.0.0.0/0 md5
 
   users:
-    admin:
-      password: admin
+    {{ percona_postgresql_admin_username }}:
+      password: {{ percona_postgresql_admin_password }}
       options:
         - createrole
         - createdb
 
 postgresql:
-  listen: 0.0.0.0:{{ postgres_port }}
+  listen: 0.0.0.0:{{ percona_postgresql_pg_port }}
 
-  connect_address: {{ inventory_hostname }}:{{ postgres_port }}
+  connect_address: {{ inventory_hostname }}:{{ percona_postgresql_pg_port }}
 
-  data_dir: {{ postgres_data_dir }}
+  data_dir: {{ percona_postgresql_data_dir }}
 
-  bin_dir: /usr/lib/postgresql/{{ version }}/bin
+  bin_dir: /usr/lib/postgresql/{{ percona_postgresql_version }}/bin
 
   parameters:
     unix_socket_directories: '/var/run/postgresql'
@@ -60,14 +60,14 @@ postgresql:
   pg_hba:
     - local all postgres trust
     - local all all trust
-    - host replication {{ replica_user }} 0.0.0.0/0 md5
+    - host replication {{ percona_postgresql_replica_user }} 0.0.0.0/0 md5
     - host all all 0.0.0.0/0 md5
 
   authentication:
     replication:
-      username: {{ replica_user }}
-      password: {{ replica_pass }}
+      username: {{ percona_postgresql_replica_user }}
+      password: {{ percona_postgresql_replica_password }}
 
     superuser:
-      username: postgres
-      password: postgres
+      username: {{ percona_postgresql_superuser_username }}
+      password: {{ percona_postgresql_superuser_password }}

@@ -1,20 +1,20 @@
 ---
-- name: restart etcd
+- name: Restart etcd
   ansible.builtin.service:
     name: etcd
     state: restarted
 
-- name: restart patroni
+- name: Restart patroni
   ansible.builtin.service:
     name: patroni
     state: restarted
     enabled: true
 
-- name: restart haproxy
+- name: Restart haproxy
   ansible.builtin.service:
     name: haproxy
     state: restarted
 
-- name: reload systemd
+- name: Reload systemd
   ansible.builtin.systemd:
     daemon_reload: true

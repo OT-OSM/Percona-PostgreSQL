@@ -9,7 +9,7 @@ defaults
     timeout server 1m
 
 frontend postgres_front
-    bind *:{{ haproxy_port }}
+    bind *:{{ percona_postgresql_haproxy_port }}
     default_backend postgres_back
 
 backend postgres_back
@@ -17,18 +17,18 @@ backend postgres_back
     http-check expect status 200
 
 {% for host in groups['postgres'] %}
-    server pg{{ loop.index }} {{ hostvars[host]['inventory_hostname'] }}:{{ postgres_port }} check port {{ patroni_rest_port }}
+    server pg{{ loop.index }} {{ hostvars[host]['inventory_hostname'] }}:{{ percona_postgresql_pg_port }} check port {{ percona_postgresql_patroni_rest_port }}
 {% endfor %}
 
-{% if haproxy_stats_enable %}
+{% if percona_postgresql_haproxy_stats_enable %}
 
 listen stats
-    bind *:{{ haproxy_stats_port }}
+    bind *:{{ percona_postgresql_haproxy_stats_port }}
     mode http
     stats enable
-    stats uri {{ haproxy_stats_uri }}
+    stats uri {{ percona_postgresql_haproxy_stats_uri }}
     stats refresh 10s
     stats show-node
-    stats auth {{ haproxy_stats_user }}:{{ haproxy_stats_password }}
+    stats auth {{ percona_postgresql_haproxy_stats_user }}:{{ percona_postgresql_haproxy_stats_password }}
 
 {% endif %}
