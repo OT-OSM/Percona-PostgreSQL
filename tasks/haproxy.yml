@@ -8,7 +8,7 @@
 - name: Configure HAProxy
   ansible.builtin.template:
     src: haproxy.cfg.j2
-    dest: "{{ haproxy_config_path }}"
+    dest: "{{ percona_postgresql_haproxy_config_path }}"
     owner: root
     group: root
     mode: "0644"
