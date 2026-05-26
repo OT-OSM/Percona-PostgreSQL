@@ -1,9 +1,11 @@
 global
     log /dev/log local0
+    log /dev/log local1 notice
 
 defaults
     log global
     mode tcp
+    option tcplog
     timeout connect 10s
     timeout client 1m
     timeout server 1m
@@ -17,7 +19,7 @@ backend postgres_back
     http-check expect status 200
 
 {% for host in groups['postgres'] %}
-    server pg{{ loop.index }} {{ hostvars[host]['inventory_hostname'] }}:{{ percona_postgresql_pg_port }} check port {{ percona_postgresql_patroni_rest_port }}
+    server pg{{ loop.index }} {{ host }}:{{ percona_postgresql_pg_port }} check port {{ percona_postgresql_patroni_rest_port }}
 {% endfor %}
 
 {% if percona_postgresql_haproxy_stats_enable %}
@@ -25,10 +27,16 @@ backend postgres_back
 listen stats
     bind *:{{ percona_postgresql_haproxy_stats_port }}
     mode http
+
     stats enable
-    stats uri {{ percona_postgresql_haproxy_stats_uri }}
+    stats hide-version
     stats refresh 10s
     stats show-node
+
+    stats uri {{ percona_postgresql_haproxy_stats_uri }}
+
+    stats realm HAProxy\ Statistics
+
     stats auth {{ percona_postgresql_haproxy_stats_user }}:{{ percona_postgresql_haproxy_stats_password }}
 
 {% endif %}
