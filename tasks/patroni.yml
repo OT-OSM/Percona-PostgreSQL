@@ -1,11 +1,11 @@
 ---
-- name: Stop PostgreSQL
+- name: Stop PostgreSQL service
   ansible.builtin.service:
     name: postgresql
     state: stopped
     enabled: false
 
-- name: Stop Patroni
+- name: Stop Patroni service
   ansible.builtin.service:
     name: patroni
     state: stopped
@@ -19,12 +19,12 @@
 
 - name: Remove PostgreSQL data directory
   ansible.builtin.file:
-    path: "{{ postgres_data_dir }}"
+    path: "{{ percona_postgresql_data_dir }}"
     state: absent
 
 - name: Recreate PostgreSQL data directory
   ansible.builtin.file:
-    path: "{{ postgres_data_dir }}"
+    path: "{{ percona_postgresql_data_dir }}"
     state: directory
     owner: postgres
     group: postgres
@@ -32,12 +32,12 @@
 
 - name: Remove PostgreSQL config directory
   ansible.builtin.file:
-    path: "{{ postgres_config_dir }}"
+    path: "{{ percona_postgresql_config_dir }}"
     state: absent
 
 - name: Create Patroni config directory
   ansible.builtin.file:
-    path: "{{ patroni_config_dir }}"
+    path: "{{ percona_postgresql_patroni_config_dir }}"
     state: directory
     owner: postgres
     group: postgres
@@ -46,7 +46,7 @@
 - name: Configure Patroni
   ansible.builtin.template:
     src: patroni.yml.j2
-    dest: "{{ patroni_config_path }}"
+    dest: "{{ percona_postgresql_patroni_config_path }}"
     owner: postgres
     group: postgres
     mode: "0644"
@@ -55,20 +55,20 @@
 
 - name: Wait for ETCD health
   ansible.builtin.uri:
-    url: "http://{{ etcd_master }}:{{ etcd_client_port }}/health"
+    url: "http://{{ percona_postgresql_etcd_host }}:{{ percona_postgresql_etcd_client_port }}/health"
     method: GET
     status_code: 200
-  register: etcd_health
+  register: percona_postgresql_etcd_health
   retries: 10
   delay: 5
-  until: etcd_health.status == 200
+  until: percona_postgresql_etcd_health.status == 200
 
-- name: Enable Patroni
+- name: Enable Patroni service
   ansible.builtin.service:
     name: patroni
     enabled: true
 
-- name: Start Patroni
+- name: Start Patroni service
   ansible.builtin.service:
     name: patroni
     state: started
