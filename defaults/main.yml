@@ -4,6 +4,7 @@ percona_postgresql_version: "16"
 percona_postgresql_cluster_name: "postgres-cluster"
 
 # PostgreSQL
+percona_postgresql_listen_address: "0.0.0.0"
 percona_postgresql_pg_port: 5432
 percona_postgresql_listen_addresses: "0.0.0.0"
 percona_postgresql_data_dir: "/var/lib/postgresql/{{ percona_postgresql_version }}/main"
@@ -54,9 +55,6 @@ percona_postgresql_packages:
   - percona-postgresql-contrib
 
 # PostgreSQL Authentication
-percona_postgresql_replica_user: "replicator"
-percona_postgresql_replica_password: "Replicator@123"
-
 percona_postgresql_superuser_username: "postgres"
 percona_postgresql_superuser_password: "postgres"
 
