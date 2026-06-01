@@ -60,3 +60,28 @@ percona_postgresql_superuser_password: "postgres"
 
 percona_postgresql_admin_username: "admin"
 percona_postgresql_admin_password: "admin"
+
+# ==========================
+# PostgreSQL DR Configuration
+# ==========================
+
+percona_postgresql_enable_dr: true
+
+# WAL-G
+percona_postgresql_walg_version: "v3.0.5"
+
+# MinIO
+percona_postgresql_minio_endpoint: "https://minio.ldc.opstree.dev:9000 "
+
+percona_postgresql_minio_access_key: "minioadmin"
+
+percona_postgresql_minio_secret_key: "opstreeadmin@2510"
+
+percona_postgresql_minio_bucket: "postgres-backup"
+
+# PostgreSQL
+percona_postgresql_data_dir: "/var/lib/postgresql/16/main"
+
+# Backup Schedule
+percona_postgresql_backup_hour: "2"
+percona_postgresql_backup_minute: "0"

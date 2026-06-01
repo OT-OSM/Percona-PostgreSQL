@@ -12,7 +12,7 @@
   ansible.builtin.include_tasks: etcd.yml
   when:
     - "'etcd' in groups"
-    - inventory_hostname == groups['etcd'][0]
+    - inventory_hostname == groups['etcd']
 
 - name: Configure Patroni
   ansible.builtin.include_tasks: patroni.yml
@@ -25,3 +25,10 @@
   when:
     - "'haproxy' in groups"
     - inventory_hostname in groups['haproxy']
+
+- name: Configure WAL-G DR
+  ansible.builtin.import_tasks: wal_g.yml
+  when:
+    - percona_postgresql_enable_dr
+    - "'postgres' in groups"
+    - inventory_hostname in groups['postgres']

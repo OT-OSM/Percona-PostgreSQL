@@ -1,0 +1,48 @@
+---
+- name: Download WAL-G
+  ansible.builtin.get_url:
+    url: "https://github.com/wal-g/wal-g/releases/download/{{ percona_postgresql_walg_version }}/wal-g-pg-ubuntu-20.04-amd64.tar.gz"
+    dest: /tmp/wal-g.tar.gz
+    mode: '0644'
+
+- name: Extract WAL-G
+  ansible.builtin.unarchive:
+    src: /tmp/wal-g.tar.gz
+    dest: /tmp
+    remote_src: true
+
+- name: Install WAL-G binary
+  ansible.builtin.copy:
+    src: /tmp/wal-g-pg-ubuntu-20.04-amd64
+    dest: /usr/local/bin/wal-g
+    remote_src: true
+    mode: '0755'
+
+- name: Install daemontools
+  ansible.builtin.apt:
+    name: daemontools
+    state: present
+    update_cache: yes
+
+- name: Create WAL-G env directory
+  ansible.builtin.file:
+    path: /etc/wal-g.d/env
+    state: directory
+    owner: postgres
+    group: postgres
+    mode: '0755'
+
+- name: Configure WAL-G environment variables
+  ansible.builtin.copy:
+    dest: "/etc/wal-g.d/env/{{ item.key }}"
+    content: "{{ item.value }}"
+    owner: postgres
+    group: postgres
+    mode: '0600'
+  loop:
+    - { key: "AWS_ACCESS_KEY_ID", value: "{{ percona_postgresql_minio_access_key }}" }
+    - { key: "AWS_SECRET_ACCESS_KEY", value: "{{ percona_postgresql_minio_secret_key }}" }
+    - { key: "AWS_ENDPOINT", value: "{{ percona_postgresql_minio_endpoint }}" }
+    - { key: "AWS_S3_FORCE_PATH_STYLE", value: "true" }
+    - { key: "WALG_S3_PREFIX", value: "s3://{{ percona_postgresql_minio_bucket }}" }
+    - { key: "PGDATA", value: "{{ percona_postgresql_data_dir }}" }
