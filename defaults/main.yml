@@ -1,12 +1,11 @@
 ---
 percona_postgresql_version: "16"
 
-percona_postgresql_cluster_name: "postgres-cluster"
-
 # PostgreSQL
-percona_postgresql_listen_address: "0.0.0.0"
 percona_postgresql_pg_port: 5432
+percona_postgresql_listen_address: "0.0.0.0"
 percona_postgresql_listen_addresses: "0.0.0.0"
+
 percona_postgresql_data_dir: "/var/lib/postgresql/{{ percona_postgresql_version }}/main"
 percona_postgresql_config_dir: "/etc/postgresql/{{ percona_postgresql_version }}/main"
 
@@ -16,7 +15,6 @@ percona_postgresql_patroni_config_dir: "/etc/patroni"
 percona_postgresql_patroni_config_path: "/etc/patroni/patroni.yml"
 
 # ETCD
-percona_postgresql_etcd_host: "192.168.8.19"
 percona_postgresql_etcd_client_port: 2379
 percona_postgresql_etcd_peer_port: 2380
 percona_postgresql_etcd_data_dir: "/var/lib/etcd/default.etcd"
@@ -30,13 +28,11 @@ percona_postgresql_haproxy_config_path: "/etc/haproxy/haproxy.cfg"
 percona_postgresql_haproxy_stats_enable: true
 percona_postgresql_haproxy_stats_port: 7000
 percona_postgresql_haproxy_stats_uri: "/"
-percona_postgresql_haproxy_stats_user: "admin"
-percona_postgresql_haproxy_stats_password: "admin123"
 
 # Replication
 percona_postgresql_replication_enabled: true
-percona_postgresql_replica_user: "replicator"
-percona_postgresql_replica_password: "Replicator@123"
+percona_postgresql_replica_user: ""
+percona_postgresql_replica_password: ""
 
 # Repository
 percona_postgresql_repo_url: "https://repo.percona.com/apt/percona-release_latest.{{ ansible_lsb.codename }}_all.deb"
@@ -48,6 +44,7 @@ percona_postgresql_createcluster_conf: "/etc/postgresql-common/createcluster.con
 # Packages
 percona_postgresql_packages:
   - acl
+  - postgresql-common
   - "percona-postgresql-{{ percona_postgresql_version }}"
   - "percona-postgresql-{{ percona_postgresql_version }}-pgaudit"
   - percona-patroni
@@ -55,8 +52,11 @@ percona_postgresql_packages:
   - percona-postgresql-contrib
 
 # PostgreSQL Authentication
-percona_postgresql_superuser_username: "postgres"
-percona_postgresql_superuser_password: "postgres"
+percona_postgresql_superuser_username: ""
+percona_postgresql_superuser_password: ""
 
-percona_postgresql_admin_username: "admin"
-percona_postgresql_admin_password: "admin"
+percona_postgresql_admin_username: ""
+percona_postgresql_admin_password: ""
+
+# Optional cleanup for fresh bootstrap
+percona_postgresql_force_clean: false
