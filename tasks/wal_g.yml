@@ -11,67 +11,97 @@
     dest: /tmp
     remote_src: true
 
-- name: Install WAL-G binary
+- name: Install WAL-G
   ansible.builtin.copy:
-    src: /tmp/wal-g
+    src: /tmp/wal-g-pg-ubuntu-20.04-amd64
     dest: /usr/local/bin/wal-g
     remote_src: true
-    owner: root
-    group: root
     mode: '0755'
 
-- name: Install daemontools
-  ansible.builtin.apt:
-    name: daemontools
-    state: present
-    update_cache: true
-
-- name: Create WAL-G env directory
+- name: Create WAL-G envdir
   ansible.builtin.file:
-    path: /etc/wal-g.d/env
+    path: "{{ percona_postgresql_walg_envdir }}"
     state: directory
     owner: postgres
     group: postgres
-    mode: '0700'
+    mode: '0755'
 
-- name: Configure WAL-G environment variables
-  ansible.builtin.copy:
-    dest: "/etc/wal-g.d/env/{{ item.key }}"
-    content: "{{ item.value }}"
+- name: Configure WAL-G environment
+  ansible.builtin.template:
+    src: wal-g.json.j2
+    dest: "{{ percona_postgresql_walg_envdir }}/env.json"
     owner: postgres
     group: postgres
-    mode: '0600'
-  loop:
-    - key: AWS_ACCESS_KEY_ID
-      value: "{{ percona_postgresql_minio_access_key }}"
+    mode: '0644'
 
-    - key: AWS_SECRET_ACCESS_KEY
-      value: "{{ percona_postgresql_minio_secret_key }}"
+- name: Enable archive_mode
+  ansible.builtin.lineinfile:
+    path: /etc/postgresql/16/main/postgresql.conf
+    regexp: '^archive_mode'
+    line: "archive_mode = on"
 
-    - key: AWS_ENDPOINT
-      value: "{{ percona_postgresql_minio_endpoint }}"
+- name: Configure archive_command
+  ansible.builtin.lineinfile:
+    path: /etc/postgresql/16/main/postgresql.conf
+    regexp: '^archive_command'
+    line: >
+      archive_command = 'envdir {{ percona_postgresql_walg_envdir }}
+      wal-g wal-push %p'
 
-    - key: AWS_S3_FORCE_PATH_STYLE
-      value: "true"
+- name: Configure restore_command
+  ansible.builtin.lineinfile:
+    path: /etc/postgresql/16/main/postgresql.conf
+    regexp: '^restore_command'
+    line: >
+      restore_command = 'envdir {{ percona_postgresql_walg_envdir }}
+      wal-g wal-fetch %f %p'
 
-    - key: WALG_S3_PREFIX
-      value: "s3://{{ percona_postgresql_minio_bucket }}"
+- name: Deploy full backup script
+  ansible.builtin.template:
+    src: backup.sh.j2
+    dest: /usr/local/bin/postgres_full_backup.sh
+    mode: '0755'
 
-    - key: PGDATA
-      value: "{{ percona_postgresql_data_dir }}"
+- name: Deploy restore script
+  ansible.builtin.template:
+    src: restore.sh.j2
+    dest: /usr/local/bin/postgres_restore.sh
+    mode: '0755'
 
-    - key: PGHOST
-      value: "/var/run/postgresql"
+- name: Deploy retention script
+  ansible.builtin.template:
+    src: retention.sh.j2
+    dest: /usr/local/bin/postgres_retention.sh
+    mode: '0755'
 
-    - key: PGPORT
-      value: "5432"
+- name: Schedule full backup
+  ansible.builtin.cron:
+    name: postgres full backup
+    user: postgres
+    job: "/usr/local/bin/postgres_full_backup.sh"
+    minute: "0"
+    hour: "1"
 
-    - key: PGUSER
-      value: "postgres"
+- name: Schedule delta backup
+  ansible.builtin.cron:
+    name: postgres delta backup
+    user: postgres
+    job: >
+      envdir {{ percona_postgresql_walg_envdir }}
+      wal-g backup-push --delta
+      {{ percona_postgresql_walg_backup_dir }}
+    minute: "0"
+    hour: "*/6"
 
-- name: Validate WAL-G access
-  become_user: postgres
-  ansible.builtin.shell: |
-    cd /tmp && envdir /etc/wal-g.d/env wal-g backup-list
-  register: walg_backup_list
-  changed_when: false
+- name: Schedule retention cleanup
+  ansible.builtin.cron:
+    name: postgres retention
+    user: postgres
+    job: "/usr/local/bin/postgres_retention.sh"
+    minute: "30"
+    hour: "2"
+
+- name: Restart PostgreSQL
+  ansible.builtin.service:
+    name: postgresql
+    state: restarted

@@ -1,0 +1,14 @@
+#!/bin/bash
+
+systemctl stop postgresql
+
+rm -rf {{ percona_postgresql_walg_backup_dir }}/*
+
+envdir {{ percona_postgresql_walg_envdir }} \
+wal-g backup-fetch {{ percona_postgresql_walg_backup_dir }} LATEST
+
+touch {{ percona_postgresql_walg_backup_dir }}/recovery.signal
+
+chown -R postgres:postgres {{ percona_postgresql_walg_backup_dir }}
+
+systemctl start postgresql

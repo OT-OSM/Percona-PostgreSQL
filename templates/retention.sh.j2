@@ -1,0 +1,4 @@
+#!/bin/bash
+
+envdir {{ percona_postgresql_walg_envdir }} \
+wal-g delete retain FULL {{ percona_postgresql_walg_retention_full }} --confirm
