@@ -1,20 +1,20 @@
 ---
 - name: Download WAL-G
   ansible.builtin.get_url:
-    url: "https://github.com/wal-g/wal-g/releases/download/{{ percona_postgresql_walg_version }}/{{ percona_postgresql_walg_binary }}"
-    dest: /tmp/wal-g.tar.gz
+    url: "{{ percona_postgresql_walg_download_url }}"
+    dest: "{{ percona_postgresql_walg_download_dest }}"
     mode: '0644'
 
-- name: Extract WAL-G
+- name: Extract WAL-G archive
   ansible.builtin.unarchive:
-    src: /tmp/wal-g.tar.gz
-    dest: /tmp
+    src: "{{ percona_postgresql_walg_download_dest }}"
+    dest: "{{ percona_postgresql_walg_extract_dir }}"
     remote_src: true
 
-- name: Install WAL-G
+- name: Install WAL-G binary
   ansible.builtin.copy:
-    src: /tmp/wal-g-pg-ubuntu-20.04-amd64
-    dest: /usr/local/bin/wal-g
+    src: "{{ percona_postgresql_walg_extracted_binary }}"
+    dest: "{{ percona_postgresql_walg_install_path }}"
     remote_src: true
     mode: '0755'
 
@@ -22,35 +22,35 @@
   ansible.builtin.file:
     path: "{{ percona_postgresql_walg_envdir }}"
     state: directory
-    owner: postgres
-    group: postgres
+    owner: "{{ percona_postgresql_user }}"
+    group: "{{ percona_postgresql_group }}"
     mode: '0755'
 
 - name: Configure WAL-G environment
   ansible.builtin.template:
     src: wal-g.json.j2
     dest: "{{ percona_postgresql_walg_envdir }}/env.json"
-    owner: postgres
-    group: postgres
+    owner: "{{ percona_postgresql_user }}"
+    group: "{{ percona_postgresql_group }}"
     mode: '0644'
 
-- name: Enable archive_mode
+- name: Enable PostgreSQL archive mode
   ansible.builtin.lineinfile:
-    path: /etc/postgresql/16/main/postgresql.conf
+    path: "{{ percona_postgresql_conf_file }}"
     regexp: '^archive_mode'
     line: "archive_mode = on"
 
-- name: Configure archive_command
+- name: Configure PostgreSQL archive_command
   ansible.builtin.lineinfile:
-    path: /etc/postgresql/16/main/postgresql.conf
+    path: "{{ percona_postgresql_conf_file }}"
     regexp: '^archive_command'
     line: >
       archive_command = 'envdir {{ percona_postgresql_walg_envdir }}
       wal-g wal-push %p'
 
-- name: Configure restore_command
+- name: Configure PostgreSQL restore_command
   ansible.builtin.lineinfile:
-    path: /etc/postgresql/16/main/postgresql.conf
+    path: "{{ percona_postgresql_conf_file }}"
     regexp: '^restore_command'
     line: >
       restore_command = 'envdir {{ percona_postgresql_walg_envdir }}
@@ -59,49 +59,49 @@
 - name: Deploy full backup script
   ansible.builtin.template:
     src: backup.sh.j2
-    dest: /usr/local/bin/postgres_full_backup.sh
+    dest: "{{ percona_postgresql_walg_full_backup_script }}"
     mode: '0755'
 
 - name: Deploy restore script
   ansible.builtin.template:
     src: restore.sh.j2
-    dest: /usr/local/bin/postgres_restore.sh
+    dest: "{{ percona_postgresql_walg_restore_script }}"
     mode: '0755'
 
-- name: Deploy retention script
+- name: Deploy retention cleanup script
   ansible.builtin.template:
     src: retention.sh.j2
-    dest: /usr/local/bin/postgres_retention.sh
+    dest: "{{ percona_postgresql_walg_retention_script }}"
     mode: '0755'
 
 - name: Schedule full backup
   ansible.builtin.cron:
     name: postgres full backup
-    user: postgres
-    job: "/usr/local/bin/postgres_full_backup.sh"
-    minute: "0"
-    hour: "1"
+    user: "{{ percona_postgresql_user }}"
+    minute: "{{ percona_postgresql_walg_full_backup_minute }}"
+    hour: "{{ percona_postgresql_walg_full_backup_hour }}"
+    job: "{{ percona_postgresql_walg_full_backup_script }}"
 
 - name: Schedule delta backup
   ansible.builtin.cron:
     name: postgres delta backup
-    user: postgres
+    user: "{{ percona_postgresql_user }}"
+    minute: "{{ percona_postgresql_walg_delta_backup_minute }}"
+    hour: "{{ percona_postgresql_walg_delta_backup_hour }}"
     job: >
       envdir {{ percona_postgresql_walg_envdir }}
       wal-g backup-push --delta
-      {{ percona_postgresql_walg_backup_dir }}
-    minute: "0"
-    hour: "*/6"
+      {{ percona_postgresql_data_dir }}
 
 - name: Schedule retention cleanup
   ansible.builtin.cron:
-    name: postgres retention
-    user: postgres
-    job: "/usr/local/bin/postgres_retention.sh"
-    minute: "30"
-    hour: "2"
+    name: postgres retention cleanup
+    user: "{{ percona_postgresql_user }}"
+    minute: "{{ percona_postgresql_walg_retention_minute }}"
+    hour: "{{ percona_postgresql_walg_retention_hour }}"
+    job: "{{ percona_postgresql_walg_retention_script }}"
 
-- name: Restart PostgreSQL
+- name: Restart PostgreSQL service
   ansible.builtin.service:
-    name: postgresql
+    name: "{{ percona_postgresql_service_name }}"
     state: restarted
