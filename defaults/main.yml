@@ -1,51 +1,112 @@
 ---
+###############################################################################
+# PostgreSQL Cluster
+###############################################################################
+
 percona_postgresql_version: "16"
 
 percona_postgresql_cluster_name: "postgres-cluster"
 
+###############################################################################
 # PostgreSQL
+###############################################################################
+
+percona_postgresql_user: "postgres"
+percona_postgresql_group: "postgres"
+
+percona_postgresql_service_name: "postgresql"
+
 percona_postgresql_listen_address: "0.0.0.0"
-percona_postgresql_pg_port: 5432
 percona_postgresql_listen_addresses: "0.0.0.0"
+
+percona_postgresql_pg_port: 5432
+
 percona_postgresql_data_dir: "/var/lib/postgresql/{{ percona_postgresql_version }}/main"
+
 percona_postgresql_config_dir: "/etc/postgresql/{{ percona_postgresql_version }}/main"
 
+percona_postgresql_conf_file: "{{ percona_postgresql_config_dir }}/postgresql.conf"
+
+###############################################################################
 # Patroni
+###############################################################################
+
+percona_postgresql_patroni_enable: true
+
 percona_postgresql_patroni_rest_port: 8008
+
 percona_postgresql_patroni_config_dir: "/etc/patroni"
+
 percona_postgresql_patroni_config_path: "/etc/patroni/patroni.yml"
 
+###############################################################################
 # ETCD
+###############################################################################
+
+percona_postgresql_etcd_enable: true
+
 percona_postgresql_etcd_host: "192.168.8.19"
+
 percona_postgresql_etcd_client_port: 2379
+
 percona_postgresql_etcd_peer_port: 2380
+
 percona_postgresql_etcd_data_dir: "/var/lib/etcd/default.etcd"
+
 percona_postgresql_etcd_config_path: "/etc/etcd/etcd.conf.yaml"
 
+###############################################################################
 # HAProxy
+###############################################################################
+
+percona_postgresql_haproxy_enable: true
+
 percona_postgresql_haproxy_port: 5000
+
 percona_postgresql_haproxy_config_path: "/etc/haproxy/haproxy.cfg"
 
+###############################################################################
 # HAProxy Stats
+###############################################################################
+
 percona_postgresql_haproxy_stats_enable: true
+
 percona_postgresql_haproxy_stats_port: 7000
+
 percona_postgresql_haproxy_stats_uri: "/"
+
 percona_postgresql_haproxy_stats_user: "admin"
+
 percona_postgresql_haproxy_stats_password: "admin123"
 
+###############################################################################
 # Replication
+###############################################################################
+
 percona_postgresql_replication_enabled: true
+
 percona_postgresql_replica_user: "replicator"
+
 percona_postgresql_replica_password: "Replicator@123"
 
+###############################################################################
 # Repository
+###############################################################################
+
 percona_postgresql_repo_url: "https://repo.percona.com/apt/percona-release_latest.{{ ansible_lsb.codename }}_all.deb"
 
+###############################################################################
 # PostgreSQL Common
+###############################################################################
+
 percona_postgresql_common_path: "/etc/postgresql-common"
+
 percona_postgresql_createcluster_conf: "/etc/postgresql-common/createcluster.conf"
 
+###############################################################################
 # Packages
+###############################################################################
+
 percona_postgresql_packages:
   - acl
   - "percona-postgresql-{{ percona_postgresql_version }}"
@@ -54,24 +115,58 @@ percona_postgresql_packages:
   - "percona-pg-stat-monitor{{ percona_postgresql_version }}"
   - percona-postgresql-contrib
 
+###############################################################################
 # PostgreSQL Authentication
+###############################################################################
+
 percona_postgresql_superuser_username: "postgres"
+
 percona_postgresql_superuser_password: "postgres"
 
 percona_postgresql_admin_username: "admin"
+
 percona_postgresql_admin_password: "admin"
 
-# ==========================
+###############################################################################
 # PostgreSQL DR Configuration
-# ==========================
+###############################################################################
 
 percona_postgresql_enable_dr: true
 
-# WAL-G
+###############################################################################
+# WAL-G Configuration
+###############################################################################
+
 percona_postgresql_walg_version: "v3.0.5"
 
-# MinIO
-percona_postgresql_minio_endpoint: "https://minio.ldc.opstree.dev:9000 "
+percona_postgresql_walg_os: "ubuntu"
+
+percona_postgresql_walg_os_version: "22.04"
+
+percona_postgresql_walg_arch: "amd64"
+
+percona_postgresql_walg_binary: >-
+  wal-g-pg-{{ percona_postgresql_walg_os }}-{{ percona_postgresql_walg_os_version }}-{{ percona_postgresql_walg_arch }}.tar.gz
+
+percona_postgresql_walg_download_url: >-
+  https://github.com/wal-g/wal-g/releases/download/{{ percona_postgresql_walg_version }}/{{ percona_postgresql_walg_binary }}
+
+percona_postgresql_walg_download_dest: "/tmp/wal-g.tar.gz"
+
+percona_postgresql_walg_extract_dir: "/tmp"
+
+percona_postgresql_walg_extracted_binary: >-
+  /tmp/wal-g-pg-{{ percona_postgresql_walg_os }}-{{ percona_postgresql_walg_os_version }}-{{ percona_postgresql_walg_arch }}
+
+percona_postgresql_walg_install_path: "/usr/local/bin/wal-g"
+
+percona_postgresql_walg_envdir: "/etc/wal-g/env"
+
+###############################################################################
+# MinIO Configuration
+###############################################################################
+
+percona_postgresql_minio_endpoint: "https://minio.ldc.opstree.dev:9000"
 
 percona_postgresql_minio_access_key: "minioadmin"
 
@@ -79,9 +174,37 @@ percona_postgresql_minio_secret_key: "opstreeadmin@2510"
 
 percona_postgresql_minio_bucket: "postgres-backup"
 
-# PostgreSQL
-percona_postgresql_data_dir: "/var/lib/postgresql/16/main"
+percona_postgresql_walg_s3_prefix: >-
+  s3://{{ percona_postgresql_minio_bucket }}
 
+###############################################################################
+# Backup Scripts
+###############################################################################
+
+percona_postgresql_walg_full_backup_script: "/usr/local/bin/postgres_full_backup.sh"
+
+percona_postgresql_walg_restore_script: "/usr/local/bin/postgres_restore.sh"
+
+percona_postgresql_walg_retention_script: "/usr/local/bin/postgres_retention.sh"
+
+###############################################################################
 # Backup Schedule
-percona_postgresql_backup_hour: "2"
-percona_postgresql_backup_minute: "0"
+###############################################################################
+
+percona_postgresql_walg_full_backup_minute: "0"
+
+percona_postgresql_walg_full_backup_hour: "2"
+
+percona_postgresql_walg_delta_backup_minute: "0"
+
+percona_postgresql_walg_delta_backup_hour: "*/6"
+
+percona_postgresql_walg_retention_minute: "30"
+
+percona_postgresql_walg_retention_hour: "3"
+
+###############################################################################
+# Retention Policy
+###############################################################################
+
+percona_postgresql_walg_retention_full: 7
