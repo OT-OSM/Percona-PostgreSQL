@@ -9,20 +9,21 @@
   ansible.builtin.service:
     name: patroni
     state: stopped
-  ignore_errors: true
+  failed_when: false
 
 - name: Kill old PostgreSQL processes
   ansible.builtin.command:
     cmd: pkill -u postgres postgres
-  ignore_errors: true
+  failed_when: false
   changed_when: false
 
-- name: Remove PostgreSQL data directory
+- name: Remove PostgreSQL data directory for fresh Patroni bootstrap
   ansible.builtin.file:
     path: "{{ percona_postgresql_data_dir }}"
     state: absent
+  when: percona_postgresql_force_clean | bool
 
-- name: Recreate PostgreSQL data directory
+- name: Ensure PostgreSQL data directory exists
   ansible.builtin.file:
     path: "{{ percona_postgresql_data_dir }}"
     state: directory
@@ -63,12 +64,8 @@
   delay: 5
   until: percona_postgresql_etcd_health.status == 200
 
-- name: Enable Patroni service
+- name: Enable and start Patroni service
   ansible.builtin.service:
     name: patroni
     enabled: true
-
-- name: Start Patroni service
-  ansible.builtin.service:
-    name: patroni
     state: started
