@@ -40,16 +40,16 @@
     state: present
     update_cache: true
 
-- name: Stop PostgreSQL service
+- name: Stop standalone PostgreSQL service before Patroni management
   ansible.builtin.service:
     name: postgresql
     state: stopped
     enabled: false
-  ignore_errors: true
+  failed_when: false
 
-- name: Stop PostgreSQL cluster service
+- name: Disable default PostgreSQL cluster service for Patroni setup
   ansible.builtin.service:
     name: "postgresql@{{ percona_postgresql_version }}-main"
     state: stopped
     enabled: false
-  ignore_errors: true
+  failed_when: false
