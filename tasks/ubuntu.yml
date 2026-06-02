@@ -4,11 +4,6 @@
     update_cache: true
     cache_valid_time: 300
 
-- name: Install PostgreSQL common package
-  ansible.builtin.apt:
-    name: postgresql-common
-    state: present
-
 - name: Ensure PostgreSQL common directory exists
   ansible.builtin.file:
     path: "{{ percona_postgresql_common_path }}"
