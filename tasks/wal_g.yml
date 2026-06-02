@@ -1,7 +1,7 @@
 ---
 - name: Download WAL-G
   ansible.builtin.get_url:
-    url: "https://github.com/wal-g/wal-g/releases/download/{{ percona_postgresql_walg_version }}/wal-g-pg-ubuntu-20.04-amd64.tar.gz"
+    url: "https://github.com/wal-g/wal-g/releases/download/{{ percona_postgresql_walg_version }}/{{ percona_postgresql_walg_binary }}"
     dest: /tmp/wal-g.tar.gz
     mode: '0644'
 
@@ -13,16 +13,18 @@
 
 - name: Install WAL-G binary
   ansible.builtin.copy:
-    src: /tmp/wal-g-pg-ubuntu-20.04-amd64
+    src: /tmp/wal-g
     dest: /usr/local/bin/wal-g
     remote_src: true
+    owner: root
+    group: root
     mode: '0755'
 
 - name: Install daemontools
   ansible.builtin.apt:
     name: daemontools
     state: present
-    update_cache: yes
+    update_cache: true
 
 - name: Create WAL-G env directory
   ansible.builtin.file:
@@ -30,7 +32,7 @@
     state: directory
     owner: postgres
     group: postgres
-    mode: '0755'
+    mode: '0700'
 
 - name: Configure WAL-G environment variables
   ansible.builtin.copy:
@@ -40,9 +42,36 @@
     group: postgres
     mode: '0600'
   loop:
-    - { key: "AWS_ACCESS_KEY_ID", value: "{{ percona_postgresql_minio_access_key }}" }
-    - { key: "AWS_SECRET_ACCESS_KEY", value: "{{ percona_postgresql_minio_secret_key }}" }
-    - { key: "AWS_ENDPOINT", value: "{{ percona_postgresql_minio_endpoint }}" }
-    - { key: "AWS_S3_FORCE_PATH_STYLE", value: "true" }
-    - { key: "WALG_S3_PREFIX", value: "s3://{{ percona_postgresql_minio_bucket }}" }
-    - { key: "PGDATA", value: "{{ percona_postgresql_data_dir }}" }
+    - key: AWS_ACCESS_KEY_ID
+      value: "{{ percona_postgresql_minio_access_key }}"
+
+    - key: AWS_SECRET_ACCESS_KEY
+      value: "{{ percona_postgresql_minio_secret_key }}"
+
+    - key: AWS_ENDPOINT
+      value: "{{ percona_postgresql_minio_endpoint }}"
+
+    - key: AWS_S3_FORCE_PATH_STYLE
+      value: "true"
+
+    - key: WALG_S3_PREFIX
+      value: "s3://{{ percona_postgresql_minio_bucket }}"
+
+    - key: PGDATA
+      value: "{{ percona_postgresql_data_dir }}"
+
+    - key: PGHOST
+      value: "/var/run/postgresql"
+
+    - key: PGPORT
+      value: "5432"
+
+    - key: PGUSER
+      value: "postgres"
+
+- name: Validate WAL-G access
+  become_user: postgres
+  ansible.builtin.shell: |
+    cd /tmp && envdir /etc/wal-g.d/env wal-g backup-list
+  register: walg_backup_list
+  changed_when: false
