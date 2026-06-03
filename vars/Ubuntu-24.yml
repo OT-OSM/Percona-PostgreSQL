@@ -8,4 +8,4 @@ debian_package:
   - percona-postgresql-contrib
 
 # WAL-G
-percona_postgresql_walg_binary: wal-g-pg-linux-amd64.tar.gz
+# percona_postgresql_walg_binary: wal-g-pg-linux-amd64.tar.gz
