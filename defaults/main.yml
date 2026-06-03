@@ -237,6 +237,37 @@ percona_postgresql_walg_retention_minute: "30"
 percona_postgresql_walg_retention_hour: "3"
 
 ###############################################################################
+# Daily Backup Schedule
+###############################################################################
+
+percona_postgresql_daily_backup_minute: "0"
+percona_postgresql_daily_backup_hour: "1"
+
+###############################################################################
+# Weekly Backup Schedule
+###############################################################################
+
+percona_postgresql_weekly_backup_minute: "0"
+percona_postgresql_weekly_backup_hour: "2"
+percona_postgresql_weekly_backup_day: "0"
+
+###############################################################################
+# Monthly Backup Schedule
+###############################################################################
+
+percona_postgresql_monthly_backup_minute: "0"
+percona_postgresql_monthly_backup_hour: "3"
+percona_postgresql_monthly_backup_day: "1"
+
+###############################################################################
+# Retention Cleanup Schedule
+###############################################################################
+
+percona_postgresql_retention_cleanup_minute: "30"
+percona_postgresql_retention_cleanup_hour: "3"
+
+
+###############################################################################
 # Retention Policy
 ###############################################################################
 
