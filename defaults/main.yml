@@ -188,6 +188,8 @@ percona_postgresql_walg_envdir: "/etc/wal-g.d/env"
 
 percona_postgresql_walg_backup_dir: "/var/lib/postgresql/backups"
 
+percona_postgresql_walg_binary_name: "wal-g-pg-ubuntu-22.04-amd64"
+
 ###############################################################################
 
 # MinIO Configuration
