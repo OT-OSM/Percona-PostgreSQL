@@ -174,11 +174,9 @@ percona_postgresql_walg_os_version: "22.04"
 
 percona_postgresql_walg_arch: "amd64"
 
-percona_postgresql_walg_binary: >-
-wal-g-pg-{{ percona_postgresql_walg_os }}-{{ percona_postgresql_walg_os_version }}-{{ percona_postgresql_walg_arch }}.tar.gz
+percona_postgresql_walg_binary: "wal-g-pg-{{ percona_postgresql_walg_os }}-{{ percona_postgresql_walg_os_version }}-{{ percona_postgresql_walg_arch }}.tar.gz"
 
-percona_postgresql_walg_download_url: >-
-https://github.com/wal-g/wal-g/releases/download/{{ percona_postgresql_walg_version }}/{{ percona_postgresql_walg_binary }}
+percona_postgresql_walg_download_url: "https://github.com/wal-g/wal-g/releases/download/{{ percona_postgresql_walg_version }}/{{ percona_postgresql_walg_binary }}"
 
 percona_postgresql_walg_download_dest: "/tmp/wal-g.tar.gz"
 
@@ -204,8 +202,7 @@ percona_postgresql_minio_secret_key: "opstreeadmin@2510"
 
 percona_postgresql_minio_bucket: "postgres-backup"
 
-percona_postgresql_walg_s3_prefix: >-
-s3://{{ percona_postgresql_minio_bucket }}
+percona_postgresql_walg_s3_prefix: s3://{{ percona_postgresql_minio_bucket }}
 
 ###############################################################################
 
