@@ -29,6 +29,7 @@ bootstrap:
         max_replication_slots: 10
         archive_mode: "on"
         archive_command: 'envdir /etc/wal-g.d/env wal-g wal-push %p'
+        restore_command: 'envdir /etc/wal-g.d/env wal-g wal-fetch %f %p'
         archive_timeout: 60
 
   initdb:
