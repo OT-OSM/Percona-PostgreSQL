@@ -44,13 +44,97 @@
     group: "{{ percona_postgresql_group }}"
     mode: '0755'
 
-- name: Configure WAL-G environment
-  ansible.builtin.template:
-    src: wal-g.json.j2
-    dest: "{{ percona_postgresql_walg_envdir }}/env.json"
+###############################################################################
+# WAL-G Environment Variables
+###############################################################################
+
+- name: Configure WALG_S3_PREFIX
+  ansible.builtin.copy:
+    content: "{{ percona_postgresql_walg_s3_prefix }}"
+    dest: "{{ percona_postgresql_walg_envdir }}/WALG_S3_PREFIX"
     owner: "{{ percona_postgresql_user }}"
     group: "{{ percona_postgresql_group }}"
-    mode: '0644'
+    mode: '0600'
+
+- name: Configure AWS_ACCESS_KEY_ID
+  ansible.builtin.copy:
+    content: "{{ percona_postgresql_minio_access_key }}"
+    dest: "{{ percona_postgresql_walg_envdir }}/AWS_ACCESS_KEY_ID"
+    owner: "{{ percona_postgresql_user }}"
+    group: "{{ percona_postgresql_group }}"
+    mode: '0600'
+
+- name: Configure AWS_SECRET_ACCESS_KEY
+  ansible.builtin.copy:
+    content: "{{ percona_postgresql_minio_secret_key }}"
+    dest: "{{ percona_postgresql_walg_envdir }}/AWS_SECRET_ACCESS_KEY"
+    owner: "{{ percona_postgresql_user }}"
+    group: "{{ percona_postgresql_group }}"
+    mode: '0600'
+
+- name: Configure AWS_ENDPOINT
+  ansible.builtin.copy:
+    content: "{{ percona_postgresql_minio_endpoint }}"
+    dest: "{{ percona_postgresql_walg_envdir }}/AWS_ENDPOINT"
+    owner: "{{ percona_postgresql_user }}"
+    group: "{{ percona_postgresql_group }}"
+    mode: '0600'
+
+- name: Configure AWS_S3_FORCE_PATH_STYLE
+  ansible.builtin.copy:
+    content: "true"
+    dest: "{{ percona_postgresql_walg_envdir }}/AWS_S3_FORCE_PATH_STYLE"
+    owner: "{{ percona_postgresql_user }}"
+    group: "{{ percona_postgresql_group }}"
+    mode: '0600'
+
+###############################################################################
+# PostgreSQL Environment Variables
+###############################################################################
+
+- name: Configure PGHOST
+  ansible.builtin.copy:
+    content: "/var/run/postgresql"
+    dest: "{{ percona_postgresql_walg_envdir }}/PGHOST"
+    owner: "{{ percona_postgresql_user }}"
+    group: "{{ percona_postgresql_group }}"
+    mode: '0600'
+
+- name: Configure PGPORT
+  ansible.builtin.copy:
+    content: "5432"
+    dest: "{{ percona_postgresql_walg_envdir }}/PGPORT"
+    owner: "{{ percona_postgresql_user }}"
+    group: "{{ percona_postgresql_group }}"
+    mode: '0600'
+
+- name: Configure PGUSER
+  ansible.builtin.copy:
+    content: "postgres"
+    dest: "{{ percona_postgresql_walg_envdir }}/PGUSER"
+    owner: "{{ percona_postgresql_user }}"
+    group: "{{ percona_postgresql_group }}"
+    mode: '0600'
+
+- name: Configure PGDATABASE
+  ansible.builtin.copy:
+    content: "postgres"
+    dest: "{{ percona_postgresql_walg_envdir }}/PGDATABASE"
+    owner: "{{ percona_postgresql_user }}"
+    group: "{{ percona_postgresql_group }}"
+    mode: '0600'
+
+- name: Configure PGSSLMODE
+  ansible.builtin.copy:
+    content: "disable"
+    dest: "{{ percona_postgresql_walg_envdir }}/PGSSLMODE"
+    owner: "{{ percona_postgresql_user }}"
+    group: "{{ percona_postgresql_group }}"
+    mode: '0600'
+
+###############################################################################
+# Backup Scripts
+###############################################################################
 
 - name: Deploy full backup script
   ansible.builtin.template:
@@ -75,6 +159,10 @@
     owner: "{{ percona_postgresql_user }}"
     group: "{{ percona_postgresql_group }}"
     mode: '0755'
+
+###############################################################################
+# Cron Jobs
+###############################################################################
 
 - name: Schedule full backup
   ansible.builtin.cron:
