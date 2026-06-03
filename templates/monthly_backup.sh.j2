@@ -1,0 +1,7 @@
+#!/bin/bash
+
+export WALG_S3_PREFIX=s3://{{ percona_postgresql_minio_bucket }}/monthly
+
+envdir {{ percona_postgresql_walg_envdir }} \
+wal-g backup-push {{ percona_postgresql_data_dir }}
+
