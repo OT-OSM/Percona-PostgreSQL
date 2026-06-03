@@ -35,8 +35,7 @@
   ansible.builtin.package:
     name: daemontools
     state: present
-    update_cache: true
-    
+
 - name: Create WAL-G envdir
   ansible.builtin.file:
     path: "{{ percona_postgresql_walg_envdir }}"
@@ -53,44 +52,28 @@
     group: "{{ percona_postgresql_group }}"
     mode: '0644'
 
-- name: Enable PostgreSQL archive mode
-  ansible.builtin.lineinfile:
-    path: "{{ percona_postgresql_conf_file }}"
-    regexp: '^archive_mode'
-    line: "archive_mode = on"
-
-- name: Configure PostgreSQL archive_command
-  ansible.builtin.lineinfile:
-    path: "{{ percona_postgresql_conf_file }}"
-    regexp: '^archive_command'
-    line: >
-      archive_command = 'envdir {{ percona_postgresql_walg_envdir }}
-      wal-g wal-push %p'
-
-- name: Configure PostgreSQL restore_command
-  ansible.builtin.lineinfile:
-    path: "{{ percona_postgresql_conf_file }}"
-    regexp: '^restore_command'
-    line: >
-      restore_command = 'envdir {{ percona_postgresql_walg_envdir }}
-      wal-g wal-fetch %f %p'
-
 - name: Deploy full backup script
   ansible.builtin.template:
     src: backup.sh.j2
     dest: "{{ percona_postgresql_walg_full_backup_script }}"
+    owner: "{{ percona_postgresql_user }}"
+    group: "{{ percona_postgresql_group }}"
     mode: '0755'
 
 - name: Deploy restore script
   ansible.builtin.template:
     src: restore.sh.j2
     dest: "{{ percona_postgresql_walg_restore_script }}"
+    owner: "{{ percona_postgresql_user }}"
+    group: "{{ percona_postgresql_group }}"
     mode: '0755'
 
 - name: Deploy retention cleanup script
   ansible.builtin.template:
     src: retention.sh.j2
     dest: "{{ percona_postgresql_walg_retention_script }}"
+    owner: "{{ percona_postgresql_user }}"
+    group: "{{ percona_postgresql_group }}"
     mode: '0755'
 
 - name: Schedule full backup
@@ -109,8 +92,7 @@
     hour: "{{ percona_postgresql_walg_delta_backup_hour }}"
     job: >
       envdir {{ percona_postgresql_walg_envdir }}
-      wal-g backup-push --delta
-      {{ percona_postgresql_data_dir }}
+      wal-g backup-push --delta {{ percona_postgresql_data_dir }}
 
 - name: Schedule retention cleanup
   ansible.builtin.cron:
