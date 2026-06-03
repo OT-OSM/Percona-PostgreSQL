@@ -249,3 +249,5 @@ percona_postgresql_weekly_retention_weeks: 4
 # Monthly full backup retention (6 months)
 percona_postgresql_monthly_retention_months: 6
 
+percona_postgresql_walg_retention_full: 7
+
