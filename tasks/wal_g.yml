@@ -11,22 +11,9 @@
     dest: "{{ percona_postgresql_walg_extract_dir }}"
     remote_src: true
 
-- name: Find WAL-G binary
-  ansible.builtin.find:
-    paths: "{{ percona_postgresql_walg_extract_dir }}"
-    patterns: "wal-g*"
-    file_type: file
-    recurse: true
-  register: walg_binary
-
-- name: Fail if WAL-G binary not found
-  ansible.builtin.fail:
-    msg: "WAL-G binary not found after extraction"
-  when: walg_binary.matched == 0
-
 - name: Install WAL-G binary
   ansible.builtin.copy:
-    src: "{{ walg_binary.files[0].path }}"
+    src: "{{ percona_postgresql_walg_extract_dir }}/wal-g"
     dest: "{{ percona_postgresql_walg_install_path }}"
     remote_src: true
     mode: '0755'
