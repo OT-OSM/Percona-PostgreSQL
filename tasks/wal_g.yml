@@ -172,25 +172,44 @@
 
 ###############################################################################
 # Cron Jobs
+# Daily Incremental Backup
 ###############################################################################
 
-- name: Schedule full backup
+- name: Schedule daily incremental backup
   ansible.builtin.cron:
-    name: postgres full backup
+    name: postgres daily incremental backup
     user: "{{ percona_postgresql_user }}"
-    minute: "{{ percona_postgresql_walg_full_backup_minute }}"
-    hour: "{{ percona_postgresql_walg_full_backup_hour }}"
-    job: "{{ percona_postgresql_walg_full_backup_script }}"
-
-- name: Schedule delta backup
-  ansible.builtin.cron:
-    name: postgres delta backup
-    user: "{{ percona_postgresql_user }}"
-    minute: "{{ percona_postgresql_walg_delta_backup_minute }}"
-    hour: "{{ percona_postgresql_walg_delta_backup_hour }}"
+    minute: "0"
+    hour: "1"
     job: >
       envdir {{ percona_postgresql_walg_envdir }}
       wal-g backup-push --delta {{ percona_postgresql_data_dir }}
+
+###############################################################################
+# Weekly Full Backup
+###############################################################################
+
+- name: Schedule weekly full backup
+  ansible.builtin.cron:
+    name: postgres weekly full backup
+    user: "{{ percona_postgresql_user }}"
+    minute: "0"
+    hour: "2"
+    weekday: "0"
+    job: "{{ percona_postgresql_walg_full_backup_script }}"
+
+###############################################################################
+# Monthly Full Backup
+###############################################################################
+
+- name: Schedule monthly full backup
+  ansible.builtin.cron:
+    name: postgres monthly full backup
+    user: "{{ percona_postgresql_user }}"
+    minute: "0"
+    hour: "3"
+    day: "1"
+    job: "{{ percona_postgresql_walg_full_backup_script }}"
 
 - name: Schedule retention cleanup
   ansible.builtin.cron:
