@@ -279,7 +279,7 @@
     user: "{{ percona_postgresql_user }}"
     minute: "{{ percona_postgresql_walg_retention_minute }}"
     hour: "{{ percona_postgresql_walg_retention_hour }}"
-    job: "{{ percona_postgresql_retention_script }}"
+    job: "{{ percona_postgresql_walg_retention_script }}"
 
 - name: Deploy daily backup script
   ansible.builtin.template:
