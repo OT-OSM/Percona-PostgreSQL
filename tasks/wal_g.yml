@@ -240,8 +240,3 @@
     owner: "{{ percona_postgresql_user }}"
     group: "{{ percona_postgresql_group }}"
     mode: '0755'
-    
-- name: Restart PostgreSQL service
-  ansible.builtin.service:
-    name: "{{ percona_postgresql_service_name }}"
-    state: restarted
