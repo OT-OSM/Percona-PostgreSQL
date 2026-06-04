@@ -284,3 +284,9 @@ percona_postgresql_monthly_retention_months: 6
 
 percona_postgresql_walg_retention_full: 7
 
+###############################################################################
+# Safety Controls
+###############################################################################
+
+percona_postgresql_force_rebuild: false
+percona_postgresql_allow_destructive: false
