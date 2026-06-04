@@ -217,6 +217,30 @@
     hour: "{{ percona_postgresql_walg_retention_hour }}"
     job: "{{ percona_postgresql_walg_retention_script }}"
 
+- name: Deploy daily backup script
+  ansible.builtin.template:
+    src: daily_backup.sh.j2
+    dest: "{{ percona_postgresql_daily_backup_script }}"
+    owner: "{{ percona_postgresql_user }}"
+    group: "{{ percona_postgresql_group }}"
+    mode: '0755'
+
+- name: Deploy weekly backup script
+  ansible.builtin.template:
+    src: weekly_backup.sh.j2
+    dest: "{{ percona_postgresql_weekly_backup_script }}"
+    owner: "{{ percona_postgresql_user }}"
+    group: "{{ percona_postgresql_group }}"
+    mode: '0755'
+
+- name: Deploy monthly backup script
+  ansible.builtin.template:
+    src: monthly_backup.sh.j2
+    dest: "{{ percona_postgresql_monthly_backup_script }}"
+    owner: "{{ percona_postgresql_user }}"
+    group: "{{ percona_postgresql_group }}"
+    mode: '0755'
+    
 - name: Restart PostgreSQL service
   ansible.builtin.service:
     name: "{{ percona_postgresql_service_name }}"
