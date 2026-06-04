@@ -1,66 +1,4 @@
 ---
-###############################################################################
-# SAFETY CHECKS
-###############################################################################
-
-- name: Prevent accidental PostgreSQL rebuild
-  ansible.builtin.fail:
-    msg: >
-      Refusing to remove PostgreSQL data directory.
-      Set percona_postgresql_force_rebuild=true and
-      percona_postgresql_allow_destructive=true explicitly.
-  when:
-    - percona_postgresql_force_rebuild | default(false)
-    - not percona_postgresql_allow_destructive | default(false)
-
-###############################################################################
-# DANGEROUS OPERATIONS (ONLY FOR EXPLICIT REBUILD)
-###############################################################################
-
-- name: Stop PostgreSQL service
-  ansible.builtin.service:
-    name: postgresql
-    state: stopped
-    enabled: false
-  when:
-    - percona_postgresql_force_rebuild | default(false)
-
-- name: Stop Patroni service
-  ansible.builtin.service:
-    name: patroni
-    state: stopped
-  ignore_errors: true
-  when:
-    - percona_postgresql_force_rebuild | default(false)
-
-- name: Kill old PostgreSQL processes
-  ansible.builtin.command:
-    cmd: pkill -u postgres postgres
-  ignore_errors: true
-  changed_when: false
-  when:
-    - percona_postgresql_force_rebuild | default(false)
-
-- name: Remove PostgreSQL data directory
-  ansible.builtin.file:
-    path: "{{ percona_postgresql_data_dir }}"
-    state: absent
-  when:
-    - percona_postgresql_force_rebuild | default(false)
-    - percona_postgresql_allow_destructive | default(false)
-
-###############################################################################
-# NORMAL OPERATIONS
-###############################################################################
-
-- name: Ensure PostgreSQL data directory exists
-  ansible.builtin.file:
-    path: "{{ percona_postgresql_data_dir }}"
-    state: directory
-    owner: postgres
-    group: postgres
-    mode: "0700"
-
 - name: Create Patroni config directory
   ansible.builtin.file:
     path: "{{ percona_postgresql_patroni_config_dir }}"
@@ -94,7 +32,7 @@
     name: patroni
     enabled: true
 
-- name: Ensure Patroni service is running
+- name: Start Patroni service
   ansible.builtin.service:
     name: patroni
     state: started
