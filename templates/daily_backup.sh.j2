@@ -2,6 +2,5 @@
 
 cd /tmp || exit 1
 
-WALG_S3_PREFIX="s3://{{ percona_postgresql_minio_bucket }}/daily" \
-envdir {{ percona_postgresql_walg_envdir }} \
-wal-g backup-push --delta {{ percona_postgresql_data_dir }}
+envdir {{ percona_postgresql_walg_daily_envdir }} \
+wal-g backup-push {{ percona_postgresql_data_dir }}

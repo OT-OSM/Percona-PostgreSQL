@@ -54,9 +54,49 @@
     group: "{{ percona_postgresql_group }}"
     mode: '0755'
 
+
+###############################################################################
+# WAL-G Backup Environment Directories
+###############################################################################
+
+- name: Create WAL-G backup env directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ percona_postgresql_user }}"
+    group: "{{ percona_postgresql_group }}"
+    mode: "0755"
+  loop:
+    - "{{ percona_postgresql_walg_daily_envdir }}"
+    - "{{ percona_postgresql_walg_weekly_envdir }}"
+    - "{{ percona_postgresql_walg_monthly_envdir }}"
 ###############################################################################
 # WAL-G Environment Variables
 ###############################################################################
+
+- name: Configure Daily WALG_S3_PREFIX
+  ansible.builtin.copy:
+    content: "{{ percona_postgresql_walg_daily_prefix }}"
+    dest: "{{ percona_postgresql_walg_daily_envdir }}/WALG_S3_PREFIX"
+    owner: "{{ percona_postgresql_user }}"
+    group: "{{ percona_postgresql_group }}"
+    mode: "0600"
+
+- name: Configure Weekly WALG_S3_PREFIX
+  ansible.builtin.copy:
+    content: "{{ percona_postgresql_walg_weekly_prefix }}"
+    dest: "{{ percona_postgresql_walg_weekly_envdir }}/WALG_S3_PREFIX"
+    owner: "{{ percona_postgresql_user }}"
+    group: "{{ percona_postgresql_group }}"
+    mode: "0600"
+
+- name: Configure Monthly WALG_S3_PREFIX
+  ansible.builtin.copy:
+    content: "{{ percona_postgresql_walg_monthly_prefix }}"
+    dest: "{{ percona_postgresql_walg_monthly_envdir }}/WALG_S3_PREFIX"
+    owner: "{{ percona_postgresql_user }}"
+    group: "{{ percona_postgresql_group }}"
+    mode: "0600"
 
 - name: Configure WALG_S3_PREFIX
   ansible.builtin.copy:
@@ -97,6 +137,7 @@
     owner: "{{ percona_postgresql_user }}"
     group: "{{ percona_postgresql_group }}"
     mode: '0600'
+
 
 ###############################################################################
 # PostgreSQL Environment Variables
@@ -141,6 +182,34 @@
     owner: "{{ percona_postgresql_user }}"
     group: "{{ percona_postgresql_group }}"
     mode: '0600'
+
+- name: Copy WAL-G env files to backup envdirs
+  ansible.builtin.copy:
+    src: "{{ percona_postgresql_walg_envdir }}/{{ item.1 }}"
+    dest: "{{ item.0 }}/{{ item.1 }}"
+    remote_src: true
+    owner: "{{ percona_postgresql_user }}"
+    group: "{{ percona_postgresql_group }}"
+    mode: "0600"
+  loop: "{{ query('nested',
+          [
+            [
+              percona_postgresql_walg_daily_envdir,
+              percona_postgresql_walg_weekly_envdir,
+              percona_postgresql_walg_monthly_envdir
+            ],
+            [
+              'AWS_ACCESS_KEY_ID',
+              'AWS_SECRET_ACCESS_KEY',
+              'AWS_ENDPOINT',
+              'AWS_S3_FORCE_PATH_STYLE',
+              'PGHOST',
+              'PGPORT',
+              'PGUSER',
+              'PGDATABASE',
+              'PGSSLMODE'
+            ]
+          ]) }}"
 
 ###############################################################################
 # Backup Scripts
@@ -194,7 +263,7 @@
     minute: "{{ percona_postgresql_weekly_backup_minute }}"
     hour: "{{ percona_postgresql_weekly_backup_hour }}"
     weekday: "{{ percona_postgresql_weekly_backup_day }}"
-    job: "{{ percona_postgresql_walg_full_backup_script }}"
+    job: "{{ percona_postgresql_walg_weekly_backup_script }}"
 
 ###############################################################################
 # Monthly Full Backup
@@ -207,7 +276,7 @@
     minute: "{{ percona_postgresql_monthly_backup_minute }}"
     hour: "{{ percona_postgresql_monthly_backup_hour }}"
     day: "{{ percona_postgresql_monthly_backup_day }}"
-    job: "{{ percona_postgresql_walg_full_backup_script }}"
+    job: "{{ percona_postgresql_walg_monthly_backup_script }}"
 
 - name: Schedule retention cleanup
   ansible.builtin.cron:
