@@ -270,7 +270,9 @@ percona_postgresql_retention_cleanup_hour: "3"
 ###############################################################################
 # Retention Policy
 ###############################################################################
-
+percona_postgresql_daily_backup_script: "/usr/local/bin/postgres_daily_backup.sh"
+percona_postgresql_weekly_backup_script: "/usr/local/bin/postgres_weekly_backup.sh"
+percona_postgresql_monthly_backup_script: "/usr/local/bin/postgres_monthly_backup.sh"
 # Daily incremental backup retention (6 days)
 percona_postgresql_daily_retention_days: 6
 
