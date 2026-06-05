@@ -41,16 +41,6 @@ percona_postgresql_repo_url: "https://repo.percona.com/apt/percona-release_lates
 percona_postgresql_common_path: "/etc/postgresql-common"
 percona_postgresql_createcluster_conf: "/etc/postgresql-common/createcluster.conf"
 
-# Packages
-percona_postgresql_packages:
-  - acl
-  - postgresql-common
-  - "percona-postgresql-{{ percona_postgresql_version }}"
-  - "percona-postgresql-{{ percona_postgresql_version }}-pgaudit"
-  - percona-patroni
-  - "percona-pg-stat-monitor{{ percona_postgresql_version }}"
-  - percona-postgresql-contrib
-
 # PostgreSQL Authentication
 percona_postgresql_superuser_username: ""
 percona_postgresql_superuser_password: ""
