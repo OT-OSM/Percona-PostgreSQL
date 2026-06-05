@@ -1,27 +1,9 @@
 ---
-- name: Stop PostgreSQL service
+- name: Stop standalone PostgreSQL service
   ansible.builtin.service:
     name: postgresql
     state: stopped
     enabled: false
-
-- name: Stop Patroni service
-  ansible.builtin.service:
-    name: patroni
-    state: stopped
-  failed_when: false
-
-- name: Kill old PostgreSQL processes
-  ansible.builtin.command:
-    cmd: pkill -u postgres postgres
-  failed_when: false
-  changed_when: false
-
-- name: Remove PostgreSQL data directory for fresh Patroni bootstrap
-  ansible.builtin.file:
-    path: "{{ percona_postgresql_data_dir }}"
-    state: absent
-  when: percona_postgresql_force_clean | bool
 
 - name: Ensure PostgreSQL data directory exists
   ansible.builtin.file:
@@ -30,11 +12,6 @@
     owner: postgres
     group: postgres
     mode: "0700"
-
-- name: Remove PostgreSQL config directory
-  ansible.builtin.file:
-    path: "{{ percona_postgresql_config_dir }}"
-    state: absent
 
 - name: Create Patroni config directory
   ansible.builtin.file:
