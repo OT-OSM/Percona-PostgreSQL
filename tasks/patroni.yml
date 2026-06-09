@@ -33,14 +33,13 @@
 
 - name: Wait for ETCD health
   ansible.builtin.uri:
-    url: "http://{{ item }}:{{ percona_postgresql_etcd_client_port }}/health"
+    url: "http://{{ hostvars[groups['etcd'][0]].ansible_host | default(groups['etcd'][0]) }}:{{ percona_postgresql_etcd_client_port }}/health"
     method: GET
     status_code: 200
-  loop: "{{ groups['etcd'] }}"
+  register: percona_postgresql_etcd_health
   retries: 10
   delay: 5
-  register: etcd_health
-  until: etcd_health.status == 200
+  until: percona_postgresql_etcd_health.status == 200
 
 - name: Enable and start Patroni service
   ansible.builtin.service:
