@@ -9,8 +9,8 @@
   ansible.builtin.file:
     path: "{{ percona_postgresql_etcd_data_dir }}"
     state: absent
-   when: percona_postgresql_etcd_reinitialize | bool
- 
+  when: percona_postgresql_etcd_reinitialize | bool
+
 - name: Configure ETCD
   ansible.builtin.template:
     src: etcd.conf.yaml.j2
@@ -21,7 +21,8 @@
   notify:
     - Restart etcd
 
-- name: Enable ETCD service
+- name: Enable and start ETCD service
   ansible.builtin.service:
     name: etcd
     enabled: true
+    state: started
