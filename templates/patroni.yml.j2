@@ -7,8 +7,7 @@ restapi:
   connect_address: {{ inventory_hostname }}:{{ percona_postgresql_patroni_rest_port }}
 
 etcd3:
-  hosts:
-    - {{ percona_postgresql_etcd_host }}:{{ percona_postgresql_etcd_client_port }}
+  hosts: "{% for host in groups['etcd'] %}{{ host }}:{{ percona_postgresql_etcd_client_port }}{% if not loop.last %},{% endif %}{% endfor %}"
 
 bootstrap:
   method: initdb
