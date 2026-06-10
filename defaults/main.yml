@@ -33,7 +33,7 @@ percona_postgresql_etcd_cluster_token: "etcd-cluster"
 percona_postgresql_etcd_cluster_state: "new"
 
 percona_postgresql_etcd_reinitialize: false
-
+percona_postgresql_etcd_hosts: []
 # HAProxy
 percona_postgresql_haproxy_port: 5000
 percona_postgresql_haproxy_config_path: "/etc/haproxy/haproxy.cfg"
