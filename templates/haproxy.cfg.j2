@@ -20,9 +20,7 @@ backend {{ percona_postgresql_haproxy_backend_name }}
     option httpchk GET /primary
     http-check expect status 200
 
-    default-server inter {{ percona_postgresql_haproxy_health_check_interval }} \
-                   fall {{ percona_postgresql_haproxy_health_check_fall }} \
-                   rise {{ percona_postgresql_haproxy_health_check_rise }}
+    default-server inter {{ percona_postgresql_haproxy_health_check_interval }} fall {{ percona_postgresql_haproxy_health_check_fall }} rise {{ percona_postgresql_haproxy_health_check_rise }}
 
 {% for host in groups['postgres'] %}
     server pg{{ loop.index }} {{ hostvars[host].ansible_host | default(host) }}:{{ percona_postgresql_pg_port }} check port {{ percona_postgresql_patroni_rest_port }}
@@ -43,6 +41,8 @@ listen stats
 
     stats realm HAProxy\ Statistics
 
+{% if percona_postgresql_haproxy_stats_user and percona_postgresql_haproxy_stats_password %}
     stats auth {{ percona_postgresql_haproxy_stats_user }}:{{ percona_postgresql_haproxy_stats_password }}
+{% endif %}
 
 {% endif %}
