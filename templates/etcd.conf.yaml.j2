@@ -10,7 +10,7 @@ initial-advertise-peer-urls: http://{{ inventory_hostname }}:{{ percona_postgres
 
 advertise-client-urls: http://{{ inventory_hostname }}:{{ percona_postgresql_etcd_client_port }}
 
-initial-cluster: {% for host in groups['etcd'] %}{{ host }}=http://{{ host }}:{{ percona_postgresql_etcd_peer_port }}{% if not loop.last %},{% endif %}{% endfor %}
+initial-cluster: {% for host in percona_postgresql_etcd_hosts %}{{ host }}=http://{{ host }}:{{ percona_postgresql_etcd_peer_port }}{% if not loop.last %},{% endif %}{% endfor %}
 
 initial-cluster-token: etcd-cluster
 
