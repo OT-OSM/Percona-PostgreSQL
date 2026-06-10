@@ -43,7 +43,8 @@ percona_postgresql_haproxy_config_path: "/etc/haproxy/haproxy.cfg"
 percona_postgresql_haproxy_stats_enable: true
 percona_postgresql_haproxy_stats_port: 7000
 percona_postgresql_haproxy_stats_uri: "/"
-
+percona_postgresql_haproxy_stats_user: ""
+percona_postgresql_haproxy_stats_password: ""
 # Repository
 percona_postgresql_repo_url: "https://repo.percona.com/apt/percona-release_latest.{{ ansible_lsb.codename }}_all.deb"
 
