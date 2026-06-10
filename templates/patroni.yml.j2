@@ -7,7 +7,7 @@ restapi:
   connect_address: {{ hostvars[inventory_hostname].ansible_host | default(inventory_hostname) }}:{{ percona_postgresql_patroni_rest_port }}
 
 etcd3:
-  hosts: "{% for host in groups['etcd'] %}{{ hostvars[host].ansible_host | default(host) }}:{{ percona_postgresql_etcd_client_port }}{% if not loop.last %},{% endif %}{% endfor %}"
+  hosts: "{% for host in percona_postgresql_etcd_hosts %}{{ host }}:{{ percona_postgresql_etcd_client_port }}{% if not loop.last %},{% endif %}{% endfor %}"
 
 bootstrap:
   method: {{ percona_postgresql_bootstrap_method }}
