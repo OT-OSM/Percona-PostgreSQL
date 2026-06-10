@@ -24,10 +24,16 @@
     deb: "{{ percona_postgresql_repo_url }}"
     state: present
 
+- name: Check enabled Percona repositories
+  ansible.builtin.command:
+    cmd: percona-release show
+  register: percona_release_show
+  changed_when: false
+
 - name: Enable Percona PostgreSQL repository
   ansible.builtin.command:
     cmd: "percona-release setup ppg-{{ percona_postgresql_version }}"
-  changed_when: true
+  when: "'ppg-{{ percona_postgresql_version }}' not in percona_release_show.stdout"
 
 - name: Install Percona PostgreSQL packages
   ansible.builtin.apt:
