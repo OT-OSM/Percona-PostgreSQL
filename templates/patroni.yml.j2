@@ -1,0 +1,72 @@
+scope: {{ percona_postgresql_cluster_name }}
+
+name: {{ inventory_hostname }}
+
+restapi:
+  listen: {{ percona_postgresql_patroni_rest_listen_address }}:{{ percona_postgresql_patroni_rest_port }}
+  connect_address: {{ hostvars[inventory_hostname].ansible_host | default(inventory_hostname) }}:{{ percona_postgresql_patroni_rest_port }}
+
+etcd3:
+  hosts: "{% for host in percona_postgresql_etcd_hosts %}{{ host }}:{{ percona_postgresql_etcd_client_port }}{% if not loop.last %},{% endif %}{% endfor %}"
+
+bootstrap:
+  method: {{ percona_postgresql_bootstrap_method }}
+
+  dcs:
+    ttl: {{ percona_postgresql_patroni_ttl }}
+    loop_wait: {{ percona_postgresql_patroni_loop_wait }}
+    retry_timeout: {{ percona_postgresql_patroni_retry_timeout }}
+
+    postgresql:
+      use_pg_rewind: {{ percona_postgresql_use_pg_rewind }}
+      use_slots: {{ percona_postgresql_use_slots }}
+
+      parameters:
+        wal_level: {{ percona_postgresql_wal_level }}
+        hot_standby: "{{ percona_postgresql_hot_standby }}"
+        max_wal_senders: {{ percona_postgresql_max_wal_senders }}
+        max_replication_slots: {{ percona_postgresql_max_replication_slots }}
+
+  initdb:
+{% for option in percona_postgresql_initdb_options %}
+    - {{ option }}
+{% endfor %}
+
+  pg_hba:
+{% for rule in percona_postgresql_pg_hba %}
+    - {{ rule }}
+{% endfor %}
+
+  users:
+    {{ percona_postgresql_admin_username }}:
+      password: {{ percona_postgresql_admin_password }}
+      options:
+{% for option in percona_postgresql_admin_options %}
+        - {{ option }}
+{% endfor %}
+
+postgresql:
+  listen: {{ percona_postgresql_listen_address }}:{{ percona_postgresql_pg_port }}
+
+  connect_address: {{ hostvars[inventory_hostname].ansible_host | default(inventory_hostname) }}:{{ percona_postgresql_pg_port }}
+
+  data_dir: {{ percona_postgresql_data_dir }}
+
+  bin_dir: {{ percona_postgresql_bin_dir }}
+
+  parameters:
+    unix_socket_directories: "{{ percona_postgresql_unix_socket_directories }}"
+
+  pg_hba:
+{% for rule in percona_postgresql_pg_hba %}
+    - {{ rule }}
+{% endfor %}
+
+  authentication:
+    replication:
+      username: {{ percona_postgresql_replica_user }}
+      password: {{ percona_postgresql_replica_password }}
+
+    superuser:
+      username: {{ percona_postgresql_superuser_username }}
+      password: {{ percona_postgresql_superuser_password }}

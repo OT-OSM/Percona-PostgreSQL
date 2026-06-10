@@ -1,39 +1,114 @@
 ---
-version: 11
+percona_postgresql_version: "16"
 
-# Postgres connection settings.
-postgres_port: 5432
-postgres_listen_addresses: localhost
+# PostgreSQL
+percona_postgresql_pg_port: 5432
+percona_postgresql_listen_address: "0.0.0.0"
 
-# Databases.
-database_creation: true
-psql_databases:
-  - name: appdb
-#   lc_collate: # defaults to 'en_US.UTF-8'
-#   lc_ctype: # defaults to 'en_US.UTF-8'
-#   encoding: # defaults to 'UTF-8'
-#   template: # defaults to 'template0'
-#   conn_limit: # defauls to 10
-#   owner: # defaults to postgresql_user
-#   state: # defaults to 'present'
+percona_postgresql_data_dir: "/var/lib/postgresql/{{ percona_postgresql_version }}/main"
+percona_postgresql_bin_dir: "/usr/lib/postgresql/{{ percona_postgresql_version }}/bin"
+percona_postgresql_unix_socket_directories: "/var/run/postgresql"
 
-# Users.
-users_creation: true
+# Patroni
+percona_postgresql_cluster_name: "postgres-cluster"
 
-psql_users:
-  - name: appuser
-    password: AppUser#Secret@123
-#   priv: # defaults to not set
-#   role_attr_flags: # defaults to not set
-    db: "appdb"
-#   state: # defaults to 'present'
-  - name: monitoring
-    password: Monitoring#Secret@123
-#   priv: # defaults to not set
-#   db: # defaults to not set
+percona_postgresql_patroni_rest_port: 8008
+percona_postgresql_patroni_rest_listen_address: "0.0.0.0"
 
+percona_postgresql_patroni_config_dir: "/etc/patroni"
+percona_postgresql_patroni_config_path: "/etc/patroni/patroni.yml"
 
-# Postgres cluster settings.
-replication: false
-replica_user: replicant
-replica_pass: Rep@1234
+percona_postgresql_patroni_ttl: 30
+percona_postgresql_patroni_loop_wait: 10
+percona_postgresql_patroni_retry_timeout: 10
+
+# ETCD
+percona_postgresql_etcd_client_port: 2379
+percona_postgresql_etcd_peer_port: 2380
+
+percona_postgresql_etcd_data_dir: "/var/lib/etcd/default.etcd"
+percona_postgresql_etcd_config_path: "/etc/etcd/etcd.conf.yaml"
+
+percona_postgresql_etcd_cluster_token: "etcd-cluster"
+percona_postgresql_etcd_cluster_state: "new"
+
+percona_postgresql_etcd_reinitialize: false
+percona_postgresql_etcd_hosts: []
+# HAProxy
+percona_postgresql_haproxy_port: 5000
+percona_postgresql_haproxy_config_path: "/etc/haproxy/haproxy.cfg"
+
+percona_postgresql_haproxy_frontend_name: "postgres_front"
+percona_postgresql_haproxy_backend_name: "postgres_back"
+
+percona_postgresql_haproxy_max_connections: 2000
+
+percona_postgresql_haproxy_timeout_connect: "10s"
+percona_postgresql_haproxy_timeout_client: "1m"
+percona_postgresql_haproxy_timeout_server: "1m"
+
+percona_postgresql_haproxy_health_check_interval: "3s"
+percona_postgresql_haproxy_health_check_fall: 3
+percona_postgresql_haproxy_health_check_rise: 2
+
+# HAProxy Stats
+percona_postgresql_haproxy_stats_enable: true
+percona_postgresql_haproxy_stats_port: 7000
+percona_postgresql_haproxy_stats_uri: "/"
+percona_postgresql_haproxy_stats_refresh: "10s"
+
+percona_postgresql_haproxy_stats_user: ""
+percona_postgresql_haproxy_stats_password: ""
+
+# Repository
+percona_postgresql_repo_url: "https://repo.percona.com/apt/percona-release_latest.{{ ansible_lsb.codename }}_all.deb"
+
+# PostgreSQL Common
+percona_postgresql_common_path: "/etc/postgresql-common"
+percona_postgresql_createcluster_conf: "/etc/postgresql-common/createcluster.conf"
+
+# Bootstrap
+percona_postgresql_bootstrap_method: "initdb"
+
+percona_postgresql_initdb_options:
+  - "encoding: UTF8"
+  - "data-checksums"
+
+# Replication
+percona_postgresql_replication_enabled: true
+
+percona_postgresql_replica_user: ""
+percona_postgresql_replica_password: ""
+
+percona_postgresql_use_pg_rewind: true
+percona_postgresql_use_slots: true
+
+# PostgreSQL Parameters
+percona_postgresql_wal_level: "replica"
+percona_postgresql_hot_standby: "on"
+percona_postgresql_max_wal_senders: 10
+percona_postgresql_max_replication_slots: 10
+
+# PostgreSQL Authentication
+percona_postgresql_superuser_username: ""
+percona_postgresql_superuser_password: ""
+
+percona_postgresql_admin_username: ""
+percona_postgresql_admin_password: ""
+
+percona_postgresql_admin_options:
+  - createrole
+  - createdb
+
+# Network Access
+percona_postgresql_replication_network: "0.0.0.0/0"
+percona_postgresql_client_network: "0.0.0.0/0"
+
+percona_postgresql_pg_hba:
+  - "local all postgres trust"
+  - "local all all trust"
+  - "host replication {{ percona_postgresql_replica_user }} {{ percona_postgresql_replication_network }} md5"
+  - "host all all {{ percona_postgresql_client_network }} md5"
+
+# Optional cleanup for fresh bootstrap
+percona_postgresql_force_clean: false
