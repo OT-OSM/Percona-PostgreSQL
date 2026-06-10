@@ -38,7 +38,7 @@ percona_postgresql_etcd_reinitialize: false
 # HAProxy
 percona_postgresql_haproxy_port: 5000
 percona_postgresql_haproxy_config_path: "/etc/haproxy/haproxy.cfg"
-
+percona_postgresql_haproxy_max_connections: 2000
 # HAProxy Stats
 percona_postgresql_haproxy_stats_enable: true
 percona_postgresql_haproxy_stats_port: 7000
