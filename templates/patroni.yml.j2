@@ -3,69 +3,64 @@ scope: {{ percona_postgresql_cluster_name }}
 name: {{ inventory_hostname }}
 
 restapi:
-  listen: 0.0.0.0:{{ percona_postgresql_patroni_rest_port }}
-  connect_address: {{ inventory_hostname }}:{{ percona_postgresql_patroni_rest_port }}
+  listen: {{ percona_postgresql_patroni_rest_listen_address }}:{{ percona_postgresql_patroni_rest_port }}
+  connect_address: {{ hostvars[inventory_hostname].ansible_host | default(inventory_hostname) }}:{{ percona_postgresql_patroni_rest_port }}
 
 etcd3:
-  hosts:
-    - {{ percona_postgresql_etcd_host }}:{{ percona_postgresql_etcd_client_port }}
+  hosts: "{% for host in percona_postgresql_etcd_hosts %}{{ host }}:{{ percona_postgresql_etcd_client_port }}{% if not loop.last %},{% endif %}{% endfor %}"
 
 bootstrap:
-  method: initdb
+  method: {{ percona_postgresql_bootstrap_method }}
 
   dcs:
-    ttl: 30
-    loop_wait: 10
-    retry_timeout: 10
+    ttl: {{ percona_postgresql_patroni_ttl }}
+    loop_wait: {{ percona_postgresql_patroni_loop_wait }}
+    retry_timeout: {{ percona_postgresql_patroni_retry_timeout }}
 
     postgresql:
-      use_pg_rewind: true
-      use_slots: true
+      use_pg_rewind: {{ percona_postgresql_use_pg_rewind }}
+      use_slots: {{ percona_postgresql_use_slots }}
 
       parameters:
-        wal_level: replica
-        hot_standby: "on"
-        max_wal_senders: 10
-        max_replication_slots: 10
-        archive_mode: "on"
-        archive_command: 'envdir /etc/wal-g.d/env wal-g wal-push %p'
-        restore_command: 'envdir /etc/wal-g.d/env wal-g wal-fetch %f %p'
-        archive_timeout: 60
+        wal_level: {{ percona_postgresql_wal_level }}
+        hot_standby: "{{ percona_postgresql_hot_standby }}"
+        max_wal_senders: {{ percona_postgresql_max_wal_senders }}
+        max_replication_slots: {{ percona_postgresql_max_replication_slots }}
 
   initdb:
-    - encoding: UTF8
-    - data-checksums
+{% for option in percona_postgresql_initdb_options %}
+    - {{ option }}
+{% endfor %}
 
   pg_hba:
-    - local all postgres trust
-    - local all all trust
-    - host replication {{ percona_postgresql_replica_user }} 0.0.0.0/0 md5
-    - host all all 0.0.0.0/0 md5
+{% for rule in percona_postgresql_pg_hba %}
+    - {{ rule }}
+{% endfor %}
 
   users:
     {{ percona_postgresql_admin_username }}:
       password: {{ percona_postgresql_admin_password }}
       options:
-        - createrole
-        - createdb
+{% for option in percona_postgresql_admin_options %}
+        - {{ option }}
+{% endfor %}
 
 postgresql:
-  listen: 0.0.0.0:{{ percona_postgresql_pg_port }}
+  listen: {{ percona_postgresql_listen_address }}:{{ percona_postgresql_pg_port }}
 
-  connect_address: {{ inventory_hostname }}:{{ percona_postgresql_pg_port }}
+  connect_address: {{ hostvars[inventory_hostname].ansible_host | default(inventory_hostname) }}:{{ percona_postgresql_pg_port }}
 
   data_dir: {{ percona_postgresql_data_dir }}
 
-  bin_dir: /usr/lib/postgresql/{{ percona_postgresql_version }}/bin
+  bin_dir: {{ percona_postgresql_bin_dir }}
 
   parameters:
-    unix_socket_directories: '/var/run/postgresql'
+    unix_socket_directories: "{{ percona_postgresql_unix_socket_directories }}"
 
   pg_hba:
-    - local all postgres trust
-    - local all all trust
-    - host replication {{ percona_postgresql_replica_user }} 0.0.0.0/0 md5
-    - host all all 0.0.0.0/0 md5
+{% for rule in percona_postgresql_pg_hba %}
+    - {{ rule }}
+{% endfor %}
 
   authentication:
     replication:
