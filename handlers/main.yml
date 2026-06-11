@@ -8,13 +8,8 @@
   ansible.builtin.service:
     name: patroni
     state: restarted
-    enabled: true
 
 - name: Restart haproxy
   ansible.builtin.service:
     name: haproxy
     state: restarted
-
-- name: Reload systemd
-  ansible.builtin.systemd:
-    daemon_reload: true
