@@ -1,25 +1,29 @@
 global
     log /dev/log local0
     log /dev/log local1 notice
+    maxconn {{ percona_postgresql_haproxy_max_connections }}
 
 defaults
     log global
     mode tcp
     option tcplog
-    timeout connect 10s
-    timeout client 1m
-    timeout server 1m
 
-frontend postgres_front
+    timeout connect {{ percona_postgresql_haproxy_timeout_connect }}
+    timeout client {{ percona_postgresql_haproxy_timeout_client }}
+    timeout server {{ percona_postgresql_haproxy_timeout_server }}
+
+frontend {{ percona_postgresql_haproxy_frontend_name }}
     bind *:{{ percona_postgresql_haproxy_port }}
-    default_backend postgres_back
+    default_backend {{ percona_postgresql_haproxy_backend_name }}
 
-backend postgres_back
+backend {{ percona_postgresql_haproxy_backend_name }}
     option httpchk GET /primary
     http-check expect status 200
 
+    default-server inter {{ percona_postgresql_haproxy_health_check_interval }} fall {{ percona_postgresql_haproxy_health_check_fall }} rise {{ percona_postgresql_haproxy_health_check_rise }}
+
 {% for host in groups['postgres'] %}
-    server pg{{ loop.index }} {{ host }}:{{ percona_postgresql_pg_port }} check port {{ percona_postgresql_patroni_rest_port }}
+    server pg{{ loop.index }} {{ hostvars[host].ansible_host | default(host) }}:{{ percona_postgresql_pg_port }} check port {{ percona_postgresql_patroni_rest_port }}
 {% endfor %}
 
 {% if percona_postgresql_haproxy_stats_enable %}
@@ -30,13 +34,15 @@ listen stats
 
     stats enable
     stats hide-version
-    stats refresh 10s
+    stats refresh {{ percona_postgresql_haproxy_stats_refresh }}
     stats show-node
 
     stats uri {{ percona_postgresql_haproxy_stats_uri }}
 
     stats realm HAProxy\ Statistics
 
+{% if percona_postgresql_haproxy_stats_user and percona_postgresql_haproxy_stats_password %}
     stats auth {{ percona_postgresql_haproxy_stats_user }}:{{ percona_postgresql_haproxy_stats_password }}
+{% endif %}
 
 {% endif %}
