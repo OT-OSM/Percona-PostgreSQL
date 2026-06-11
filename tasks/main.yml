@@ -26,6 +26,13 @@
     - "'postgres' in groups"
     - inventory_hostname in groups['postgres']
 
+- name: Configure WAL-G DR
+  ansible.builtin.include_tasks: wal_g.yml
+  when:
+    - percona_postgresql_enable_dr
+    - "'postgres' in groups"
+    - inventory_hostname in groups['postgres']
+    
 - name: Configure HAProxy
   ansible.builtin.include_tasks: haproxy.yml
   when:
