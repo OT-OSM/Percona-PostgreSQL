@@ -4,11 +4,6 @@
     update_cache: true
     cache_valid_time: 300
 
-- name: Install PostgreSQL common package
-  ansible.builtin.apt:
-    name: postgresql-common
-    state: present
-
 - name: Ensure PostgreSQL common directory exists
   ansible.builtin.file:
     path: "{{ percona_postgresql_common_path }}"
@@ -29,10 +24,16 @@
     deb: "{{ percona_postgresql_repo_url }}"
     state: present
 
+- name: Check enabled Percona repositories
+  ansible.builtin.command:
+    cmd: percona-release show
+  register: percona_release_show
+  changed_when: false
+
 - name: Enable Percona PostgreSQL repository
   ansible.builtin.command:
     cmd: "percona-release setup ppg-{{ percona_postgresql_version }}"
-  changed_when: true
+  when: "'ppg-{{ percona_postgresql_version }}' not in percona_release_show.stdout"
 
 - name: Install Percona PostgreSQL packages
   ansible.builtin.apt:
@@ -40,16 +41,16 @@
     state: present
     update_cache: true
 
-- name: Stop PostgreSQL service
+- name: Stop standalone PostgreSQL service before Patroni management
   ansible.builtin.service:
     name: postgresql
     state: stopped
     enabled: false
-  ignore_errors: true
+  failed_when: false
 
-- name: Stop PostgreSQL cluster service
+- name: Disable default PostgreSQL cluster service for Patroni setup
   ansible.builtin.service:
     name: "postgresql@{{ percona_postgresql_version }}-main"
     state: stopped
     enabled: false
-  ignore_errors: true
+  failed_when: false
