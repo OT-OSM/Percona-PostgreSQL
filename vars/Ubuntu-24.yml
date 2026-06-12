@@ -1,0 +1,11 @@
+---
+debian_package:
+  - acl
+  - percona-postgresql-{{ version }}
+  - percona-postgresql-{{ version }}-pgaudit
+  - percona-patroni
+  - percona-pg-stat-monitor{{ version }}
+  - percona-postgresql-contrib
+
+# WAL-G
+# percona_postgresql_walg_binary: wal-g-pg-linux-amd64.tar.gz

@@ -1,41 +1,40 @@
 ---
-####################### #
-# Postgres Installation #
-####################### #
 - name: Gather OS specific variables
-  include_vars: "{{ item }}"
+  ansible.builtin.include_vars: "{{ item }}"
   with_first_found:
     - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
     - "{{ ansible_distribution }}.yml"
 
-- name: Including tasks for Installation of Postgres
-  include_tasks: "{{ ansible_distribution }}.yml"
+- name: Install Percona PostgreSQL packages
+  ansible.builtin.include_tasks: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
+    - "{{ ansible_distribution }}.yml"
+  when:
+    - "'postgres' in groups"
+    - inventory_hostname in groups['postgres']
 
-#########################
-# Configure Postgres #
-#########################
-- name: Including tasks for Configuration on Postgres
-  include_tasks: "configure.yml"
+- name: Configure ETCD
+  ansible.builtin.include_tasks: etcd.yml
+  when:
+    - "'etcd' in groups"
+    - inventory_hostname in groups['etcd']
 
-# ################################ #
-# Cluster Configurtion In Postgres #
-# ################################ #
+- name: Configure Patroni
+  ansible.builtin.include_tasks: patroni.yml
+  when:
+    - "'postgres' in groups"
+    - inventory_hostname in groups['postgres']
 
-- name: Including tasks to Replication Setup
-  include_tasks: replication.yml
-  when: replication
-
-# ###################################### #
-# Database and User Creation In Postgres #
-# ###################################### #
-- name: Including tasks for Database creation
-  include_tasks: database.yml
-  when: database_creation
-  tags:
-    - create_database
-
-- name: Including tasks for User creation
-  include_tasks: users.yml
-  when: users_creation
-  tags:
-    - create_user
+- name: Configure WAL-G DR
+  ansible.builtin.include_tasks: wal_g.yml
+  when:
+    - percona_postgresql_enable_dr
+    - "'postgres' in groups"
+    - inventory_hostname in groups['postgres']
+    
+- name: Configure HAProxy
+  ansible.builtin.include_tasks: haproxy.yml
+  when:
+    - "'haproxy' in groups"
+    - inventory_hostname in groups['haproxy']

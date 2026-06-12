@@ -1,39 +1,296 @@
 ---
-version: 11
+###############################################################################
+# PostgreSQL Cluster
+###############################################################################
 
-# Postgres connection settings.
-postgres_port: 5432
-postgres_listen_addresses: localhost
+percona_postgresql_version: "16"
 
-# Databases.
-database_creation: true
-psql_databases:
-  - name: appdb
-#   lc_collate: # defaults to 'en_US.UTF-8'
-#   lc_ctype: # defaults to 'en_US.UTF-8'
-#   encoding: # defaults to 'UTF-8'
-#   template: # defaults to 'template0'
-#   conn_limit: # defauls to 10
-#   owner: # defaults to postgresql_user
-#   state: # defaults to 'present'
+###############################################################################
+# PostgreSQL
+###############################################################################
 
-# Users.
-users_creation: true
+percona_postgresql_user: "postgres"
+percona_postgresql_group: "postgres"
+percona_postgresql_service_name: "postgresql"
 
-psql_users:
-  - name: appuser
-    password: AppUser#Secret@123
-#   priv: # defaults to not set
-#   role_attr_flags: # defaults to not set
-    db: "appdb"
-#   state: # defaults to 'present'
-  - name: monitoring
-    password: Monitoring#Secret@123
-#   priv: # defaults to not set
-#   db: # defaults to not set
+percona_postgresql_pg_port: 5432
 
+percona_postgresql_data_dir: "/var/lib/postgresql/{{ percona_postgresql_version }}/main"
+percona_postgresql_bin_dir: "/usr/lib/postgresql/{{ percona_postgresql_version }}/bin"
+percona_postgresql_unix_socket_directories: "/var/run/postgresql"
 
-# Postgres cluster settings.
-replication: false
-replica_user: replicant
-replica_pass: Rep@1234
+percona_postgresql_config_dir: "/etc/postgresql/{{ percona_postgresql_version }}/main"
+percona_postgresql_conf_file: "{{ percona_postgresql_config_dir }}/postgresql.conf"
+
+###############################################################################
+# Patroni
+###############################################################################
+
+percona_postgresql_patroni_enable: true
+
+percona_postgresql_patroni_rest_port: 8008
+percona_postgresql_patroni_rest_listen_address: "0.0.0.0"
+
+percona_postgresql_patroni_config_dir: "/etc/patroni"
+percona_postgresql_patroni_config_path: "/etc/patroni/patroni.yml"
+
+percona_postgresql_patroni_ttl: 30
+percona_postgresql_patroni_loop_wait: 10
+percona_postgresql_patroni_retry_timeout: 10
+
+###############################################################################
+# ETCD
+###############################################################################
+
+percona_postgresql_etcd_enable: true
+
+percona_postgresql_etcd_client_port: 2379
+percona_postgresql_etcd_peer_port: 2380
+
+percona_postgresql_etcd_data_dir: "/var/lib/etcd/default.etcd"
+percona_postgresql_etcd_config_path: "/etc/etcd/etcd.conf.yaml"
+
+percona_postgresql_etcd_cluster_token: "etcd-cluster"
+percona_postgresql_etcd_cluster_state: "new"
+
+percona_postgresql_etcd_reinitialize: false
+
+###############################################################################
+# HAProxy
+###############################################################################
+
+percona_postgresql_haproxy_enable: true
+
+percona_postgresql_haproxy_port: 5000
+percona_postgresql_haproxy_config_path: "/etc/haproxy/haproxy.cfg"
+
+percona_postgresql_haproxy_frontend_name: "postgres_front"
+percona_postgresql_haproxy_backend_name: "postgres_back"
+
+percona_postgresql_haproxy_max_connections: 2000
+
+percona_postgresql_haproxy_timeout_connect: "10s"
+percona_postgresql_haproxy_timeout_client: "1m"
+percona_postgresql_haproxy_timeout_server: "1m"
+
+percona_postgresql_haproxy_health_check_interval: "3s"
+percona_postgresql_haproxy_health_check_fall: 3
+percona_postgresql_haproxy_health_check_rise: 2
+
+###############################################################################
+# HAProxy Stats
+###############################################################################
+
+percona_postgresql_haproxy_stats_enable: true
+
+percona_postgresql_haproxy_stats_port: 7000
+percona_postgresql_haproxy_stats_uri: "/"
+percona_postgresql_haproxy_stats_refresh: "10s"
+
+###############################################################################
+# Repository
+###############################################################################
+
+percona_postgresql_repo_url: "https://repo.percona.com/apt/percona-release_latest.{{ ansible_lsb.codename }}_all.deb"
+
+###############################################################################
+# PostgreSQL Common
+###############################################################################
+
+percona_postgresql_common_path: "/etc/postgresql-common"
+percona_postgresql_createcluster_conf: "/etc/postgresql-common/createcluster.conf"
+
+###############################################################################
+# Packages
+###############################################################################
+
+percona_postgresql_packages:
+  - acl
+  - "percona-postgresql-{{ percona_postgresql_version }}"
+  - "percona-postgresql-{{ percona_postgresql_version }}-pgaudit"
+  - percona-patroni
+  - "percona-pg-stat-monitor{{ percona_postgresql_version }}"
+  - percona-postgresql-contrib
+  - daemontools
+
+###############################################################################
+# Bootstrap
+###############################################################################
+
+percona_postgresql_bootstrap_method: "initdb"
+
+percona_postgresql_initdb_options:
+  - "encoding: UTF8"
+  - "data-checksums"
+
+###############################################################################
+# Replication
+###############################################################################
+
+percona_postgresql_replication_enabled: true
+
+percona_postgresql_use_pg_rewind: true
+percona_postgresql_use_slots: true
+
+###############################################################################
+# PostgreSQL Parameters
+###############################################################################
+
+percona_postgresql_wal_level: "replica"
+percona_postgresql_hot_standby: "on"
+
+percona_postgresql_max_wal_senders: 10
+percona_postgresql_max_replication_slots: 10
+
+###############################################################################
+# PostgreSQL Authentication
+###############################################################################
+
+percona_postgresql_admin_options:
+  - createrole
+  - createdb
+
+###############################################################################
+# Network Access
+###############################################################################
+
+percona_postgresql_replication_network: "0.0.0.0/0"
+percona_postgresql_client_network: "0.0.0.0/0"
+
+percona_postgresql_pg_hba:
+  - "local all postgres trust"
+  - "local all all trust"
+  - "host replication {{ percona_postgresql_replica_user }} {{ percona_postgresql_replication_network }} md5"
+  - "host all all {{ percona_postgresql_client_network }} md5"
+
+###############################################################################
+# PostgreSQL DR Configuration
+###############################################################################
+
+percona_postgresql_enable_dr: true
+
+###############################################################################
+# WAL-G Configuration
+###############################################################################
+
+percona_postgresql_walg_version: "v3.0.5"
+
+percona_postgresql_walg_os: "ubuntu"
+percona_postgresql_walg_os_version: "22.04"
+percona_postgresql_walg_arch: "amd64"
+
+percona_postgresql_walg_binary: "wal-g-pg-{{ percona_postgresql_walg_os }}-{{ percona_postgresql_walg_os_version }}-{{ percona_postgresql_walg_arch }}.tar.gz"
+
+percona_postgresql_walg_download_url: "https://github.com/wal-g/wal-g/releases/download/{{ percona_postgresql_walg_version }}/{{ percona_postgresql_walg_binary }}"
+
+percona_postgresql_walg_download_dest: "/tmp/wal-g.tar.gz"
+percona_postgresql_walg_extract_dir: "/tmp"
+
+percona_postgresql_walg_install_path: "/usr/local/bin/wal-g"
+percona_postgresql_walg_binary_name: "wal-g-pg-ubuntu-22.04-amd64"
+
+percona_postgresql_walg_envdir: "/etc/wal-g.d/env"
+percona_postgresql_walg_backup_dir: "/var/lib/postgresql/backups"
+
+###############################################################################
+# MinIO Configuration
+###############################################################################
+
+percona_postgresql_minio_endpoint: "https://minio.ldc.opstree.dev:9000"
+percona_postgresql_minio_bucket: "postgres-backup"
+
+percona_postgresql_walg_s3_prefix: "s3://{{ percona_postgresql_minio_bucket }}"
+
+###############################################################################
+# Backup Scripts
+###############################################################################
+
+percona_postgresql_walg_full_backup_script: "/usr/local/bin/postgres_full_backup.sh"
+
+percona_postgresql_walg_restore_script: "/usr/local/bin/postgres_restore.sh"
+percona_postgresql_walg_retention_script: "/usr/local/bin/postgres_retention.sh"
+
+percona_postgresql_daily_backup_script: "/usr/local/bin/postgres_daily_backup.sh"
+percona_postgresql_weekly_backup_script: "/usr/local/bin/postgres_weekly_backup.sh"
+percona_postgresql_monthly_backup_script: "/usr/local/bin/postgres_monthly_backup.sh"
+
+###############################################################################
+# Backup Schedule
+###############################################################################
+
+percona_postgresql_walg_full_backup_minute: "0"
+percona_postgresql_walg_full_backup_hour: "2"
+
+percona_postgresql_walg_delta_backup_minute: "0"
+percona_postgresql_walg_delta_backup_hour: "*/6"
+
+percona_postgresql_walg_retention_minute: "30"
+percona_postgresql_walg_retention_hour: "3"
+
+###############################################################################
+# Daily Backup Schedule
+###############################################################################
+
+percona_postgresql_daily_backup_minute: "0"
+percona_postgresql_daily_backup_hour: "1"
+
+###############################################################################
+# Weekly Backup Schedule
+###############################################################################
+
+percona_postgresql_weekly_backup_minute: "0"
+percona_postgresql_weekly_backup_hour: "2"
+
+# Sunday (0-6)
+percona_postgresql_weekly_backup_day: "0"
+
+###############################################################################
+# Monthly Backup Schedule
+###############################################################################
+
+percona_postgresql_monthly_backup_minute: "0"
+percona_postgresql_monthly_backup_hour: "3"
+
+percona_postgresql_monthly_backup_day: "1"
+
+###############################################################################
+# Retention Cleanup Schedule
+###############################################################################
+
+percona_postgresql_retention_cleanup_minute: "30"
+percona_postgresql_retention_cleanup_hour: "3"
+
+###############################################################################
+# Retention Policy
+###############################################################################
+
+percona_postgresql_daily_retention_days: 6
+percona_postgresql_weekly_retention_weeks: 4
+percona_postgresql_monthly_retention_months: 6
+
+percona_postgresql_walg_retention_full: 7
+
+###############################################################################
+# WAL-G Environment Directories
+###############################################################################
+
+percona_postgresql_walg_daily_envdir: "/etc/wal-g.d/daily/env"
+percona_postgresql_walg_weekly_envdir: "/etc/wal-g.d/weekly/env"
+percona_postgresql_walg_monthly_envdir: "/etc/wal-g.d/monthly/env"
+
+###############################################################################
+# Backup Storage Prefixes
+###############################################################################
+
+percona_postgresql_walg_main_prefix: "s3://{{ percona_postgresql_minio_bucket }}"
+percona_postgresql_walg_daily_prefix: "s3://{{ percona_postgresql_minio_bucket }}/daily"
+percona_postgresql_walg_weekly_prefix: "s3://{{ percona_postgresql_minio_bucket }}/weekly"
+percona_postgresql_walg_monthly_prefix: "s3://{{ percona_postgresql_minio_bucket }}/monthly"
+
+###############################################################################
+# Safety Controls
+###############################################################################
+
+percona_postgresql_force_clean: false
+percona_postgresql_force_rebuild: false
+percona_postgresql_allow_destructive: false

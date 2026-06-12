@@ -1,0 +1,23 @@
+---
+- name: Install HAProxy
+  ansible.builtin.apt:
+    name: haproxy
+    state: present
+    update_cache: true
+
+- name: Configure HAProxy
+  ansible.builtin.template:
+    src: haproxy.cfg.j2
+    dest: "{{ percona_postgresql_haproxy_config_path }}"
+    owner: root
+    group: root
+    mode: "0644"
+    validate: "haproxy -f %s -c"
+  notify:
+    - Restart haproxy
+
+- name: Enable and start HAProxy
+  ansible.builtin.service:
+    name: haproxy
+    enabled: true
+    state: started

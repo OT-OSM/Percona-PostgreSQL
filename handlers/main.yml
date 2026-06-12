@@ -1,2 +1,15 @@
 ---
-# handlers file for osm_percona_postgres
+- name: Restart etcd
+  ansible.builtin.service:
+    name: etcd
+    state: restarted
+
+- name: Restart patroni
+  ansible.builtin.service:
+    name: patroni
+    state: restarted
+
+- name: Restart haproxy
+  ansible.builtin.service:
+    name: haproxy
+    state: restarted
