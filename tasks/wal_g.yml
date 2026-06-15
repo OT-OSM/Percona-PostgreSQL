@@ -231,6 +231,12 @@
 # Daily Incremental Backup
 ###############################################################################
 
+- name: Remove legacy postgres full backup cron
+  ansible.builtin.cron:
+    name: postgres full backup
+    user: "{{ percona_postgresql_user }}"
+    state: absent
+    
 - name: Schedule daily incremental backup
   ansible.builtin.cron:
     name: postgres daily incremental backup
