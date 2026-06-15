@@ -1,5 +1,5 @@
 ---
-- name: Update package cache (Debian)
+- name: Update package cache
   ansible.builtin.apt:
     update_cache: true
     cache_valid_time: 300
@@ -22,13 +22,13 @@
     mode: "0644"
   when: ansible_os_family == "Debian"
 
-- name: Add Percona repository (Debian)
+- name: Add Percona repository
   ansible.builtin.apt:
     deb: "{{ percona_postgresql_repo_url }}"
     state: present
   when: ansible_os_family == "Debian"
 
-- name: Add Percona repository (RedHat)
+- name: Add Percona repository
   ansible.builtin.dnf:
     name: "{{ percona_postgresql_repo_url }}"
     state: present
@@ -47,14 +47,14 @@
     cmd: "percona-release setup ppg-{{ percona_postgresql_version }}"
   when: "'ppg-{{ percona_postgresql_version }}' not in percona_release_show.stdout"
 
-- name: Install Percona PostgreSQL packages (Debian)
+- name: Install Percona PostgreSQL packages
   ansible.builtin.apt:
     name: "{{ percona_postgresql_packages }}"
     state: present
     update_cache: true
   when: ansible_os_family == "Debian"
 
-- name: Install Percona PostgreSQL packages (RedHat)
+- name: Install Percona PostgreSQL packages
   ansible.builtin.dnf:
     name: "{{ percona_postgresql_packages }}"
     state: present
@@ -62,7 +62,7 @@
 
 - name: Stop standalone PostgreSQL service before Patroni management
   ansible.builtin.service:
-    name: "{{ percona_postgresql_service }}"
+    name: "{{ percona_postgresql_service_name }}"
     state: stopped
     enabled: false
   failed_when: false
