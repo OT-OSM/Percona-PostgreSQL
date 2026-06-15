@@ -217,10 +217,6 @@ percona_postgresql_monthly_backup_script: "/usr/local/bin/postgres_monthly_backu
 ###############################################################################
 # Backup Schedule
 ###############################################################################
-
-percona_postgresql_walg_full_backup_minute: "0"
-percona_postgresql_walg_full_backup_hour: "2"
-
 percona_postgresql_walg_delta_backup_minute: "0"
 percona_postgresql_walg_delta_backup_hour: "*/6"
 
@@ -231,27 +227,27 @@ percona_postgresql_walg_retention_hour: "3"
 # Daily Backup Schedule
 ###############################################################################
 
-percona_postgresql_daily_backup_minute: "0"
-percona_postgresql_daily_backup_hour: "1"
+percona_postgresql_daily_backup_minute: "*/5"
+percona_postgresql_daily_backup_hour: "*"
 
 ###############################################################################
 # Weekly Backup Schedule
 ###############################################################################
 
-percona_postgresql_weekly_backup_minute: "0"
-percona_postgresql_weekly_backup_hour: "2"
+percona_postgresql_weekly_backup_minute: "*/5"
+percona_postgresql_weekly_backup_hour: "*"
 
 # Sunday (0-6)
-percona_postgresql_weekly_backup_day: "0"
+percona_postgresql_weekly_backup_day: "*"
 
 ###############################################################################
 # Monthly Backup Schedule
 ###############################################################################
 
-percona_postgresql_monthly_backup_minute: "0"
-percona_postgresql_monthly_backup_hour: "3"
+percona_postgresql_monthly_backup_minute: "*/5"
+percona_postgresql_monthly_backup_hour: "*"
 
-percona_postgresql_monthly_backup_day: "1"
+percona_postgresql_monthly_backup_day: "*"
 
 ###############################################################################
 # Retention Cleanup Schedule
