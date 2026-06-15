@@ -1,15 +1,9 @@
 ---
 - name: Gather OS specific variables
-  ansible.builtin.include_vars: "{{ item }}"
-  with_first_found:
-    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
-    - "{{ ansible_distribution }}.yml"
+  ansible.builtin.include_vars: "{{ ansible_os_family }}.yml"
 
 - name: Install Percona PostgreSQL packages
-  ansible.builtin.include_tasks: "{{ item }}"
-  with_first_found:
-    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version }}.yml"
-    - "{{ ansible_distribution }}.yml"
+  ansible.builtin.include_tasks: install.yml
   when:
     - "'postgres' in groups"
     - inventory_hostname in groups['postgres']
@@ -32,7 +26,7 @@
     - percona_postgresql_enable_dr
     - "'postgres' in groups"
     - inventory_hostname in groups['postgres']
-    
+
 - name: Configure HAProxy
   ansible.builtin.include_tasks: haproxy.yml
   when:
