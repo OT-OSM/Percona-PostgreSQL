@@ -1,7 +1,7 @@
 ---
 percona_postgresql_packages:
   - acl
-  - "percona-postgresql-{{ percona_postgresql_version }}-main"
+  - "percona-postgresql-{{ percona_postgresql_version }}"
   - "percona-postgresql-{{ percona_postgresql_version }}-pgaudit"
   - percona-patroni
   - "percona-pg-stat-monitor{{ percona_postgresql_version }}"
