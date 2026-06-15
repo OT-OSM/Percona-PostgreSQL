@@ -1,5 +1,5 @@
 ---
-debian_package:
+percona_postgresql_packages:
   - acl
   - percona-postgresql-{{ version }}
   - percona-postgresql-{{ version }}-pgaudit
