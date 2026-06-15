@@ -210,14 +210,6 @@
 # Backup Scripts
 ###############################################################################
 
-- name: Deploy full backup script
-  ansible.builtin.template:
-    src: backup.sh.j2
-    dest: "{{ percona_postgresql_walg_full_backup_script }}"
-    owner: "{{ percona_postgresql_user }}"
-    group: "{{ percona_postgresql_group }}"
-    mode: '0755'
-
 - name: Deploy restore script
   ansible.builtin.template:
     src: restore.sh.j2
