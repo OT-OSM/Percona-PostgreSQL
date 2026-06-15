@@ -1,8 +1,9 @@
 ---
-- name: Update apt cache
+- name: Update package cache (Debian)
   ansible.builtin.apt:
     update_cache: true
     cache_valid_time: 300
+  when: ansible_os_family == "Debian"
 
 - name: Ensure PostgreSQL common directory exists
   ansible.builtin.file:
@@ -18,11 +19,20 @@
     owner: root
     group: root
     mode: "0644"
+  when: ansible_os_family == "Debian"
 
-- name: Add Percona repository
+- name: Add Percona repository (Debian)
   ansible.builtin.apt:
     deb: "{{ percona_postgresql_repo_url }}"
     state: present
+  when: ansible_os_family == "Debian"
+
+- name: Add Percona repository (RedHat)
+  ansible.builtin.dnf:
+    name: "{{ percona_postgresql_repo_url }}"
+    state: present
+    disable_gpg_check: true
+  when: ansible_os_family == "RedHat"
 
 - name: Check enabled Percona repositories
   ansible.builtin.command:
@@ -35,22 +45,29 @@
     cmd: "percona-release setup ppg-{{ percona_postgresql_version }}"
   when: "'ppg-{{ percona_postgresql_version }}' not in percona_release_show.stdout"
 
-- name: Install Percona PostgreSQL packages
+- name: Install Percona PostgreSQL packages (Debian)
   ansible.builtin.apt:
     name: "{{ percona_postgresql_packages }}"
     state: present
     update_cache: true
+  when: ansible_os_family == "Debian"
+
+- name: Install Percona PostgreSQL packages (RedHat)
+  ansible.builtin.dnf:
+    name: "{{ percona_postgresql_packages }}"
+    state: present
+  when: ansible_os_family == "RedHat"
 
 - name: Stop standalone PostgreSQL service before Patroni management
   ansible.builtin.service:
-    name: postgresql
+    name: "{{ percona_postgresql_service }}"
     state: stopped
     enabled: false
   failed_when: false
 
 - name: Disable default PostgreSQL cluster service for Patroni setup
   ansible.builtin.service:
-    name: "postgresql@{{ percona_postgresql_version }}-main"
+    name: "{{ percona_postgresql_cluster_service }}"
     state: stopped
     enabled: false
   failed_when: false
