@@ -10,6 +10,7 @@
     path: "{{ percona_postgresql_common_path }}"
     state: directory
     mode: "0755"
+  when: ansible_os_family == "Debian"
 
 - name: Disable automatic PostgreSQL cluster creation
   ansible.builtin.copy:
@@ -39,6 +40,7 @@
     cmd: percona-release show
   register: percona_release_show
   changed_when: false
+  failed_when: false
 
 - name: Enable Percona PostgreSQL repository
   ansible.builtin.command:
