@@ -158,7 +158,7 @@ percona_postgresql_replication_network: ""
 percona_postgresql_client_network: ""
 
 percona_postgresql_pg_hba:
- - "local all postgres trust"
+  - "local all postgres trust"
   - "local all all trust"
 
   - "host all all 127.0.0.1/32 md5"
