@@ -154,8 +154,8 @@ percona_postgresql_admin_options:
 # Network Access
 ###############################################################################
 
-percona_postgresql_replication_network: "192.168.8.0/24"
-percona_postgresql_client_network: "192.168.8.19/32"
+percona_postgresql_replication_network: "0.0.0.0/0"
+percona_postgresql_client_network: "0.0.0.0/0"
 
 percona_postgresql_pg_hba:
   - "local all postgres trust"
