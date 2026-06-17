@@ -1,2 +1,41 @@
-localhost
+[postgres]
+pg1 ansible_host=8.8.8.8
+pg2 ansible_host=8.8.8.8
+pg3 ansible_host=8.8.8.8
+
+[haproxy]
+lb1 ansible_host=
+
+[all:vars]
+ansible_user=opstree
+
+percona_postgresql_version=16
+percona_postgresql_cluster_name=postgres-cluster
+
+# PostgreSQL
+
+percona_postgresql_pg_port=5432
+percona_postgresql_listen_addresses="0.0.0.0"
+
+# Patroni
+
+percona_postgresql_patroni_rest_port=8008
+percona_postgresql_patroni_rest_listen_address="0.0.0.0"
+
+# ETCD
+
+percona_postgresql_etcd_hosts=[
+"8.8.8.8",
+"8.8.8.8",
+"8.8.8.8"
+]
+
+# HAProxy
+
+percona_postgresql_haproxy_port=5000
+percona_postgresql_haproxy_stats_enable=true
+percona_postgresql_haproxy_stats_port=7000
+
+percona_postgresql_haproxy_user=haproxy
+percona_postgresql_haproxy_group=haproxy
 
