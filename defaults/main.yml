@@ -29,7 +29,7 @@ percona_postgresql_conf_file: "{{ percona_postgresql_config_dir }}/postgresql.co
 percona_postgresql_patroni_enable: true
 
 percona_postgresql_patroni_rest_port: 8008
-percona_postgresql_patroni_rest_listen_address: {{ ansible_default_ipv4.address }}
+percona_postgresql_patroni_rest_listen_address: "{{ ansible_default_ipv4.address }}"
 
 percona_postgresql_patroni_config_dir: "/etc/patroni"
 percona_postgresql_patroni_config_path: "/etc/patroni/patroni.yml"
