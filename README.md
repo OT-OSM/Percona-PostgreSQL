@@ -44,18 +44,26 @@ Inventory
 ----------
 An inventory should look like this:-
 ```ini
-[master]                 
-192.168.1.198
+[postgres]
+pg1 ansible_host=192.168.8.1
+pg2 ansible_host=192.168.8.2
+pg3 ansible_host=192.168.8.2
 
-[slave]
-192.168.3.201
+[haproxy]
+lb1 ansible_host=192.168.8.8
 
-[postgres_cluster:children]
-master
-slave
+[etcd]
+pg1 ansible_host=192.168.8.1
+pg2 ansible_host=192.168.8.2
+pg3 ansible_host=192.168.8.2
 
-[postgres_cluster:vars]
-ansible_user=ubuntu
+# ETCD
+percona_postgresql_etcd_hosts=[
+"192.168.1.3",
+"192.168.1.2",
+"192.168.1.1"
+]
+
 ```
 
 Example Playbook
