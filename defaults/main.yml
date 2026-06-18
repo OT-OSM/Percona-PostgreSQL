@@ -38,10 +38,6 @@ percona_postgresql_patroni_ttl: 30
 percona_postgresql_patroni_loop_wait: 10
 percona_postgresql_patroni_retry_timeout: 10
 
-percona_postgresql_patroni_nodes:
-  - 192.168.8.19
-  - 192.168.8.20
-  - 192.168.8.27
 
 ###############################################################################
 # ETCD
