@@ -4,8 +4,8 @@
     msg: "{{ groups['postgres'] }}"
 
 - name: Show backend hosts
-  debug:
-    msg: "{{ item }} -> {{ hostvars[item].ansible_host }}"
+  ansible.builtin.debug:
+    msg: "{{ item }}"
   loop: "{{ groups['postgres'] }}"
   
 - name: Install HAProxy
