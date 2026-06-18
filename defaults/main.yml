@@ -88,7 +88,7 @@ percona_postgresql_haproxy_stats_ssl_cert: "/etc/haproxy/certs/haproxy.pem"
 
 percona_postgresql_haproxy_stats_enable: true
 
-percona_postgresql_haproxy_stats_port: 7000
+percona_postgresql_haproxy_stats_port: 443
 percona_postgresql_haproxy_stats_uri: "/"
 percona_postgresql_haproxy_stats_refresh: "10s"
 
