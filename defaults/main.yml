@@ -79,6 +79,8 @@ percona_postgresql_haproxy_health_check_fall: 3
 percona_postgresql_haproxy_health_check_rise: 2
 percona_postgresql_haproxy_user: haproxy
 percona_postgresql_haproxy_group: haproxy
+percona_postgresql_haproxy_stats_ssl_enable: true
+percona_postgresql_haproxy_stats_ssl_cert: "/etc/haproxy/certs/haproxy.pem"
 
 ###############################################################################
 # HAProxy Stats
