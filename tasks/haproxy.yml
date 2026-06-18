@@ -1,13 +1,4 @@
 ---
-- name: Show postgres group
-  debug:
-    msg: "{{ groups['postgres'] }}"
-
-- name: Show backend hosts
-  ansible.builtin.debug:
-    msg: "{{ item }}"
-  loop: "{{ groups['postgres'] }}"
-  
 - name: Install HAProxy
   ansible.builtin.apt:
     name: haproxy
