@@ -31,9 +31,13 @@ backend {{ percona_postgresql_haproxy_backend_name }}
 {% if percona_postgresql_haproxy_stats_enable %}
 
 listen stats
+{% if percona_postgresql_haproxy_stats_ssl_enable %}
+    bind *:{{ percona_postgresql_haproxy_stats_port }} ssl crt {{ percona_postgresql_haproxy_stats_ssl_cert }}
+{% else %}
     bind *:{{ percona_postgresql_haproxy_stats_port }}
+{% endif %}
     mode http
-
+      
     stats enable
     stats hide-version
     stats refresh {{ percona_postgresql_haproxy_stats_refresh }}
