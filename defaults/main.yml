@@ -76,6 +76,8 @@ percona_postgresql_haproxy_timeout_server: "1m"
 percona_postgresql_haproxy_health_check_interval: "3s"
 percona_postgresql_haproxy_health_check_fall: 3
 percona_postgresql_haproxy_health_check_rise: 2
+percona_postgresql_haproxy_user: haproxy
+percona_postgresql_haproxy_group: haproxy
 
 ###############################################################################
 # HAProxy Stats
