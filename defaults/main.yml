@@ -300,3 +300,8 @@ percona_postgresql_walg_monthly_prefix: "s3://{{ percona_postgresql_minio_bucket
 percona_postgresql_force_clean: false
 percona_postgresql_force_rebuild: false
 percona_postgresql_allow_destructive: false
+
+percona_postgresql_enable_postgres_exporter: true
+
+percona_postgresql_exporter_user: exporter
+percona_postgresql_exporter_password: ""
