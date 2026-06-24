@@ -16,22 +16,6 @@
     mode: "0600"
   notify: Restart postgres_exporter
 
-- name: Create exporter role
-  become_user: postgres
-  community.postgresql.postgresql_user:
-    name: "{{ percona_postgresql_exporter_user }}"
-    password: "{{ percona_postgresql_exporter_password }}"
-    role_attr_flags: LOGIN
-    state: present
-
-- name: Grant pg_monitor role
-  become_user: postgres
-  community.postgresql.postgresql_membership:
-    group: pg_monitor
-    target_roles:
-      - "{{ percona_postgresql_exporter_user }}"
-    state: present
-
 - name: Enable postgres_exporter service
   ansible.builtin.systemd:
     name: postgres_exporter
