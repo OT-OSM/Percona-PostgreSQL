@@ -14,7 +14,7 @@
     owner: root
     group: root
     mode: "0600"
-  notify: restart postgres_exporter
+  notify: Restart postgres_exporter
 
 - name: Create exporter role
   become_user: postgres
