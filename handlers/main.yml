@@ -13,3 +13,8 @@
   ansible.builtin.service:
     name: haproxy
     state: restarted
+
+- name: Restart postgres_exporter
+  ansible.builtin.systemd:
+    name: postgres_exporter
+    state: restarted
