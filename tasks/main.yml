@@ -20,6 +20,14 @@
     - "'postgres' in groups"
     - inventory_hostname in groups['postgres']
 
+
+- name: Configure PostgreSQL Exporter
+  ansible.builtin.include_tasks: postgres_exporter.yml
+  when:
+    - percona_postgresql_enable_postgres_exporter
+    - "'postgres' in groups"
+    - inventory_hostname in groups['postgres']
+
 - name: Configure WAL-G DR
   ansible.builtin.include_tasks: wal_g.yml
   when:
