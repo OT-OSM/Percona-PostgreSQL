@@ -28,6 +28,16 @@
     - "'postgres' in groups"
     - inventory_hostname in groups['postgres']
 
+- name: Install Node Exporter
+  ansible.builtin.include_tasks: node_exporter.yml
+  when:
+    - percona_postgresql_enable_node_exporter
+    - inventory_hostname in (
+        groups['postgres']
+        + groups['etcd']
+        + groups['haproxy']
+      )
+
 - name: Configure WAL-G DR
   ansible.builtin.include_tasks: wal_g.yml
   when:
