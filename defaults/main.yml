@@ -146,7 +146,7 @@ percona_postgresql_hot_standby: "on"
 
 percona_postgresql_max_wal_senders: 10
 percona_postgresql_max_replication_slots: 10
-
+percona_postgresql_archive_timeout: "60s"
 ###############################################################################
 # PostgreSQL Authentication
 ###############################################################################
