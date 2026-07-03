@@ -162,10 +162,14 @@ percona_postgresql_admin_options:
 percona_postgresql_replication_network: ""
 percona_postgresql_client_network: ""
 
+
 percona_postgresql_pg_hba:
   - "local all postgres trust"
   - "local all all trust"
-
+  
+  - "local replication {{ percona_postgresql_replica_user }} trust"
+  - "host replication {{ percona_postgresql_replica_user }} 127.0.0.1/32 md5"
+  - "host replication {{ percona_postgresql_replica_user }} ::1/128 md5"
   - "host all all 127.0.0.1/32 md5"
   - "host all all ::1/128 md5"
 
@@ -202,6 +206,8 @@ percona_postgresql_walg_binary_name: "wal-g-pg-ubuntu-22.04-amd64"
 percona_postgresql_walg_envdir: "/etc/wal-g.d/env"
 percona_postgresql_walg_backup_dir: "/var/lib/postgresql/backups"
 
+percona_postgresql_wal_keep_size: "4GB"
+percona_postgresql_max_slot_wal_keep_size: "-1"
 ###############################################################################
 # MinIO Configuration
 ###############################################################################
