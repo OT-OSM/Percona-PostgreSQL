@@ -26,7 +26,8 @@ bootstrap:
         hot_standby: "{{ percona_postgresql_hot_standby }}"
         max_wal_senders: {{ percona_postgresql_max_wal_senders }}
         max_replication_slots: {{ percona_postgresql_max_replication_slots }}
-
+        shared_preload_libraries: "{{ percona_postgresql_shared_preload_libraries | join(',') }}"
+        
   initdb:
 {% for option in percona_postgresql_initdb_options %}
     - {{ option }}
@@ -56,6 +57,7 @@ postgresql:
 
   parameters:
     unix_socket_directories: "{{ percona_postgresql_unix_socket_directories }}"
+    shared_preload_libraries: "{{ percona_postgresql_shared_preload_libraries | join(',') }}"
 
   pg_hba:
 {% for rule in percona_postgresql_pg_hba %}
