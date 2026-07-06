@@ -183,6 +183,23 @@ percona_postgresql_pg_hba:
 
 percona_postgresql_enable_dr: true
 
+
+###############################################################################
+# PostgreSQL Extensions
+###############################################################################
+
+###############################################################################
+# PostgreSQL Extensions
+###############################################################################
+
+# Libraries loaded during PostgreSQL startup
+percona_postgresql_shared_preload_libraries:
+  - pg_stat_statements
+
+# SQL endpoint (HAProxy write endpoint)
+percona_postgresql_sql_host: "{{ hostvars[groups['haproxy'][0]].ansible_host | default(groups['haproxy'][0]) }}"
+percona_postgresql_sql_port: "{{ percona_postgresql_haproxy_port }}"
+
 ###############################################################################
 # WAL-G Configuration
 ###############################################################################

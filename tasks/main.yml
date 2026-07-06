@@ -20,6 +20,12 @@
     - "'postgres' in groups"
     - inventory_hostname in groups['postgres']
 
+- name: Configure PostgreSQL Extensions
+  ansible.builtin.include_tasks: postgresql_extensions.yml
+  when:
+    - "'postgres' in groups"
+    - inventory_hostname == groups['postgres'][0]
+
 
 - name: Configure PostgreSQL Exporter
   ansible.builtin.include_tasks: postgres_exporter.yml

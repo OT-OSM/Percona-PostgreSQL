@@ -1,0 +1,40 @@
+---
+- name: Wait until PostgreSQL is reachable through HAProxy
+  community.postgresql.postgresql_ping:
+    login_host: "{{ percona_postgresql_sql_host }}"
+    login_port: "{{ percona_postgresql_sql_port }}"
+    login_user: "{{ percona_postgresql_superuser_username }}"
+    login_password: "{{ percona_postgresql_superuser_password }}"
+  register: pg_ready
+  retries: 30
+  delay: 5
+  until: pg_ready.is_available
+
+- name: Get all user databases
+  community.postgresql.postgresql_query:
+    login_host: "{{ percona_postgresql_sql_host }}"
+    login_port: "{{ percona_postgresql_sql_port }}"
+    login_user: "{{ percona_postgresql_superuser_username }}"
+    login_password: "{{ percona_postgresql_superuser_password }}"
+    login_db: postgres
+    query: |
+      SELECT datname
+      FROM pg_database
+      WHERE datistemplate = false
+        AND datallowconn = true;
+  register: postgres_databases
+
+- name: Enable pg_stat_statements in all databases
+  community.postgresql.postgresql_ext:
+    login_host: "{{ percona_postgresql_sql_host }}"
+    login_port: "{{ percona_postgresql_sql_port }}"
+    login_user: "{{ percona_postgresql_superuser_username }}"
+    login_password: "{{ percona_postgresql_superuser_password }}"
+    db: "{{ item.datname }}"
+    name: pg_stat_statements
+    state: present
+  loop: "{{ postgres_databases.query_all_results[0] }}"
+  register: extension_result
+  retries: 5
+  delay: 5
+  until: extension_result is succeeded
