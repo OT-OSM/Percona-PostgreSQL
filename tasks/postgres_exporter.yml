@@ -31,7 +31,7 @@
 - name: Extract postgres_exporter archive
   ansible.builtin.unarchive:
     src: "{{ percona_postgresql_exporter_download_dest }}"
-    dest: "/tmp"
+    dest: /tmp
     remote_src: true
     creates: "/tmp/postgres_exporter-{{ percona_postgresql_exporter_version }}.{{ percona_postgresql_exporter_arch }}"
 
