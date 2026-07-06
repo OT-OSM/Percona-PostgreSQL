@@ -39,9 +39,9 @@
   when:
     - percona_postgresql_enable_node_exporter
     - inventory_hostname in (
-        groups['postgres']
-        + groups['etcd']
-        + groups['haproxy']
+        (groups['postgres'] | default([]))
+        + (groups['etcd'] | default([]))
+        + (groups['haproxy'] | default([]))
       )
 
 - name: Configure WAL-G DR

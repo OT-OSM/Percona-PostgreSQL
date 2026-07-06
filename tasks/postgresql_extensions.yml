@@ -9,6 +9,7 @@
   retries: 30
   delay: 5
   until: pg_ready.is_available
+  run_once: true
 
 - name: Get all user databases
   community.postgresql.postgresql_query:
@@ -23,6 +24,7 @@
       WHERE datistemplate = false
         AND datallowconn = true;
   register: postgres_databases
+  run_once: true
 
 - name: Enable pg_stat_statements in all databases
   community.postgresql.postgresql_ext:
@@ -38,3 +40,4 @@
   retries: 5
   delay: 5
   until: extension_result is succeeded
+  run_once: true
