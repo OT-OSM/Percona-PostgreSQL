@@ -24,7 +24,6 @@
   ansible.builtin.include_tasks: postgresql_extensions.yml
   when:
     - "'postgres' in groups"
-    - inventory_hostname == groups['postgres'][0]
 
 
 - name: Configure PostgreSQL Exporter
@@ -38,11 +37,7 @@
   ansible.builtin.include_tasks: node_exporter.yml
   when:
     - percona_postgresql_enable_node_exporter
-    - inventory_hostname in (
-        (groups['postgres'] | default([]))
-        + (groups['etcd'] | default([]))
-        + (groups['haproxy'] | default([]))
-      )
+    - "'postgres' in group_names or 'etcd' in group_names or 'haproxy' in group_names"
 
 - name: Configure WAL-G DR
   ansible.builtin.include_tasks: wal_g.yml

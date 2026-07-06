@@ -188,10 +188,6 @@ percona_postgresql_enable_dr: true
 # PostgreSQL Extensions
 ###############################################################################
 
-###############################################################################
-# PostgreSQL Extensions
-###############################################################################
-
 # Libraries loaded during PostgreSQL startup
 percona_postgresql_shared_preload_libraries:
   - pg_stat_statements
