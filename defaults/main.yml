@@ -70,9 +70,9 @@ percona_postgresql_haproxy_backend_name: "postgres_back"
 
 percona_postgresql_haproxy_max_connections: 2000
 
-percona_postgresql_haproxy_timeout_connect: "10s"
-percona_postgresql_haproxy_timeout_client: "1m"
-percona_postgresql_haproxy_timeout_server: "1m"
+percona_postgresql_haproxy_timeout_connect: "30s"
+percona_postgresql_haproxy_timeout_client: "5m"
+percona_postgresql_haproxy_timeout_server: "5m"
 
 percona_postgresql_haproxy_health_check_interval: "3s"
 percona_postgresql_haproxy_health_check_fall: 3
@@ -325,8 +325,7 @@ percona_postgresql_node_exporter_binary: "{{ percona_postgresql_node_exporter_in
 
 percona_postgresql_node_exporter_download_dest: "/tmp/node_exporter.tar.gz"
 
-percona_postgresql_node_exporter_download_url: >-
-  https://github.com/prometheus/node_exporter/releases/download/v{{ percona_postgresql_node_exporter_version }}/node_exporter-{{ percona_postgresql_node_exporter_version }}.{{ percona_postgresql_node_exporter_arch }}.tar.gz
+percona_postgresql_node_exporter_download_url: "https://github.com/prometheus/node_exporter/releases/download/v{{ percona_postgresql_node_exporter_version }}/node_exporter-{{ percona_postgresql_node_exporter_version }}.{{ percona_postgresql_node_exporter_arch }}.tar.gz"
 
 percona_postgresql_node_exporter_collectors:
   - "--collector.systemd"
@@ -343,21 +342,18 @@ percona_postgresql_exporter_arch: "linux-amd64"
 
 percona_postgresql_exporter_user: "exporter"
 percona_postgresql_exporter_password: ""
-percona_postgresql_exporter_group: "{{ percona_postgresql_group }}"
+percona_postgresql_exporter_group: "postgres"
 
 percona_postgresql_exporter_install_dir: "/usr/local/bin"
 percona_postgresql_exporter_binary: "{{ percona_postgresql_exporter_install_dir }}/postgres_exporter"
 
 percona_postgresql_exporter_download_dest: "/tmp/postgres_exporter.tar.gz"
 
-percona_postgresql_exporter_download_url: >-
-  https://github.com/prometheus-community/postgres_exporter/releases/download/v{{ percona_postgresql_exporter_version }}/postgres_exporter-{{ percona_postgresql_exporter_version }}.{{ percona_postgresql_exporter_arch }}.tar.gz
+percona_postgresql_exporter_download_url: "https://github.com/prometheus-community/postgres_exporter/releases/download/v{{ percona_postgresql_exporter_version }}/postgres_exporter-{{ percona_postgresql_exporter_version }}.{{ percona_postgresql_exporter_arch }}.tar.gz"
 
 percona_postgresql_exporter_listen_address: "0.0.0.0"
 percona_postgresql_exporter_port: 9187
 
-percona_postgresql_exporter_web_listen_address: >-
-  {{ percona_postgresql_exporter_listen_address }}:{{ percona_postgresql_exporter_port }}
+percona_postgresql_exporter_web_listen_address: "{{ percona_postgresql_exporter_listen_address }}:{{ percona_postgresql_exporter_port }}"
 
-percona_postgresql_exporter_data_source_uri: >-
-  localhost:{{ percona_postgresql_pg_port }}/postgres?sslmode=disable
+percona_postgresql_exporter_data_source_uri: "localhost:{{ percona_postgresql_pg_port }}/postgres?sslmode=disable"
