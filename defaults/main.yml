@@ -342,7 +342,7 @@ percona_postgresql_exporter_arch: "linux-amd64"
 
 percona_postgresql_exporter_user: "exporter"
 percona_postgresql_exporter_password: ""
-percona_postgresql_exporter_group: "postgres"
+percona_postgresql_exporter_group: "exporter"
 
 percona_postgresql_exporter_install_dir: "/usr/local/bin"
 percona_postgresql_exporter_binary: "{{ percona_postgresql_exporter_install_dir }}/postgres_exporter"
@@ -357,3 +357,4 @@ percona_postgresql_exporter_port: 9187
 percona_postgresql_exporter_web_listen_address: "{{ percona_postgresql_exporter_listen_address }}:{{ percona_postgresql_exporter_port }}"
 
 percona_postgresql_exporter_data_source_uri: "localhost:{{ percona_postgresql_pg_port }}/postgres?sslmode=disable"
+percona_postgresql_exporter_service_file: "/etc/systemd/system/postgres_exporter.service"
