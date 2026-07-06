@@ -14,7 +14,16 @@
     name: haproxy
     state: restarted
 
+- name: Reload systemd
+  ansible.builtin.systemd:
+    daemon_reload: true
+
 - name: Restart postgres_exporter
   ansible.builtin.systemd:
     name: postgres_exporter
+    state: restarted
+
+- name: Restart node_exporter
+  ansible.builtin.systemd:
+    name: node_exporter
     state: restarted
