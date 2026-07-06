@@ -341,7 +341,6 @@ percona_postgresql_exporter_version: "0.18.0"
 percona_postgresql_exporter_arch: "linux-amd64"
 
 percona_postgresql_exporter_user: "exporter"
-percona_postgresql_exporter_password: ""
 percona_postgresql_exporter_group: "exporter"
 
 percona_postgresql_exporter_install_dir: "/usr/local/bin"
@@ -351,10 +350,22 @@ percona_postgresql_exporter_download_dest: "/tmp/postgres_exporter.tar.gz"
 
 percona_postgresql_exporter_download_url: "https://github.com/prometheus-community/postgres_exporter/releases/download/v{{ percona_postgresql_exporter_version }}/postgres_exporter-{{ percona_postgresql_exporter_version }}.{{ percona_postgresql_exporter_arch }}.tar.gz"
 
+percona_postgresql_exporter_config_dir: "/etc/postgres_exporter"
+
+percona_postgresql_exporter_service_file: "/etc/systemd/system/postgres_exporter.service"
+
 percona_postgresql_exporter_listen_address: "0.0.0.0"
 percona_postgresql_exporter_port: 9187
 
 percona_postgresql_exporter_web_listen_address: "{{ percona_postgresql_exporter_listen_address }}:{{ percona_postgresql_exporter_port }}"
 
 percona_postgresql_exporter_data_source_uri: "localhost:{{ percona_postgresql_pg_port }}/postgres?sslmode=disable"
-percona_postgresql_exporter_service_file: "/etc/systemd/system/postgres_exporter.service"
+
+percona_postgresql_exporter_password: ""
+
+percona_postgresql_exporter_collectors:
+  - "--collector.statio_user_tables"
+  - "--collector.stat_user_tables"
+  - "--collector.statio_user_indexes"
+  - "--collector.stat_wal_receiver"
+  - "--collector.process_idle"
