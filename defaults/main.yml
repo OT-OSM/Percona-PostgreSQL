@@ -193,8 +193,8 @@ percona_postgresql_shared_preload_libraries:
   - pg_stat_statements
 
 # SQL endpoint (HAProxy write endpoint)
-percona_postgresql_sql_host: "{{ hostvars[groups['haproxy'][0]].ansible_host | default(groups['haproxy'][0]) }}"
-percona_postgresql_sql_port: "{{ percona_postgresql_haproxy_port }}"
+percona_postgresql_sql_host: "192.168.8.2"
+percona_postgresql_sql_port: 5000
 
 ###############################################################################
 # WAL-G Configuration
