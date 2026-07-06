@@ -327,10 +327,12 @@ percona_postgresql_node_exporter_download_dest: "/tmp/node_exporter.tar.gz"
 
 percona_postgresql_node_exporter_download_url: "https://github.com/prometheus/node_exporter/releases/download/v{{ percona_postgresql_node_exporter_version }}/node_exporter-{{ percona_postgresql_node_exporter_version }}.{{ percona_postgresql_node_exporter_arch }}.tar.gz"
 
+percona_postgresql_node_exporter_service_file: "/etc/systemd/system/node_exporter.service"
+
 percona_postgresql_node_exporter_collectors:
   - "--collector.systemd"
   - "--collector.processes"
-
+  
 ###############################################################################
 # PostgreSQL Exporter
 ###############################################################################
