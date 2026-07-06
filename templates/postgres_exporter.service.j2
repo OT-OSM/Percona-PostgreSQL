@@ -1,16 +1,19 @@
 [Unit]
-Description=Prometheus PostgreSQL Exporter
+Description=PostgreSQL Exporter
 After=network.target
 
 [Service]
 Type=simple
+
 User={{ percona_postgresql_exporter_user }}
 Group={{ percona_postgresql_exporter_group }}
 
 EnvironmentFile={{ percona_postgresql_exporter_config_dir }}/postgres_exporter.env
 
 ExecStart={{ percona_postgresql_exporter_binary }} \
-  --web.listen-address={{ percona_postgresql_exporter_web_listen_address }}
+{% for collector in percona_postgresql_exporter_collectors %}
+  {{ collector }} \
+{% endfor %}
 
 Restart=always
 RestartSec=5
