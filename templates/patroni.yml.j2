@@ -30,6 +30,16 @@ bootstrap:
         wal_keep_size: {{ percona_postgresql_wal_keep_size }}
         max_slot_wal_keep_size: {{ percona_postgresql_max_slot_wal_keep_size }}
         archive_timeout: {{ percona_postgresql_archive_timeout}}
+        shared_buffers: "{{ pg_shared_buffers }}"
+        effective_cache_size: "{{ pg_effective_cache_size }}"
+        maintenance_work_mem: "{{ pg_maintenance_work_mem }}"
+        work_mem: "{{ pg_work_mem }}"
+        max_connections: "{{ pg_max_connections }}"
+        max_worker_processes: "{{ pg_max_worker_processes }}"
+        max_parallel_workers: "{{ pg_max_parallel_workers }}"
+        max_parallel_workers_per_gather: "{{ pg_max_parallel_workers_per_gather }}"
+        effective_io_concurrency: "{{ pg_effective_io_concurrency }}"
+        random_page_cost: "{{ pg_random_page_cost }}"
   initdb:
 {% for option in percona_postgresql_initdb_options %}
     - {{ option }}
@@ -63,6 +73,17 @@ postgresql:
     wal_keep_size: {{ percona_postgresql_wal_keep_size }}
     max_slot_wal_keep_size: {{ percona_postgresql_max_slot_wal_keep_size }}
     archive_timeout: {{ percona_postgresql_archive_timeout }}
+    shared_buffers: "{{ pg_shared_buffers }}"
+    effective_cache_size: "{{ pg_effective_cache_size }}"
+    maintenance_work_mem: "{{ pg_maintenance_work_mem }}"
+    work_mem: "{{ pg_work_mem }}"
+    max_connections: "{{ pg_max_connections }}"
+    max_worker_processes: "{{ pg_max_worker_processes }}"
+    max_parallel_workers: "{{ pg_max_parallel_workers }}"
+    max_parallel_workers_per_gather: "{{ pg_max_parallel_workers_per_gather }}"
+    effective_io_concurrency: "{{ pg_effective_io_concurrency }}"
+    random_page_cost: "{{ pg_random_page_cost }}"
+    
   pg_hba:
 {% for rule in percona_postgresql_pg_hba %}
     - {{ rule }}

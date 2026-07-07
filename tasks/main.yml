@@ -13,6 +13,13 @@
   when:
     - "'etcd' in groups"
     - inventory_hostname in groups['etcd']
+  
+- name: Calculate PostgreSQL dynamic configuration
+  ansible.builtin.include_tasks: calculate_postgresql_config.yml
+  when:
+    - percona_postgresql_enable_dynamic_config | default(true)
+    - "'postgres' in groups"
+    - inventory_hostname in groups['postgres']
 
 - name: Configure Patroni
   ansible.builtin.include_tasks: patroni.yml
