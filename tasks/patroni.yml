@@ -1,0 +1,48 @@
+---
+- name: Stop standalone PostgreSQL service
+  ansible.builtin.service:
+    name: postgresql
+    state: stopped
+    enabled: false
+
+- name: Ensure PostgreSQL data directory exists
+  ansible.builtin.file:
+    path: "{{ percona_postgresql_data_dir }}"
+    state: directory
+    owner: postgres
+    group: postgres
+    mode: "0700"
+
+- name: Create Patroni config directory
+  ansible.builtin.file:
+    path: "{{ percona_postgresql_patroni_config_dir }}"
+    state: directory
+    owner: postgres
+    group: postgres
+    mode: "0755"
+
+- name: Configure Patroni
+  ansible.builtin.template:
+    src: patroni.yml.j2
+    dest: "{{ percona_postgresql_patroni_config_path }}"
+    owner: postgres
+    group: postgres
+    mode: "0644"
+  notify:
+    - Restart patroni
+
+- name: Wait for ETCD health
+  ansible.builtin.uri:
+    url: "http://{{ hostvars[groups['etcd'][0]].ansible_host | default(groups['etcd'][0]) }}:{{ percona_postgresql_etcd_client_port }}/health"
+    method: GET
+    status_code: 200
+  register: percona_postgresql_etcd_health
+  retries: 10
+  delay: 5
+  until: percona_postgresql_etcd_health.status == 200
+
+- name: Enable and start Patroni service
+  ansible.builtin.service:
+    name: patroni
+    enabled: true
+    state: started

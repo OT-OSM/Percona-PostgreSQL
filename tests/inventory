@@ -1,2 +1,15 @@
-localhost
+[postgres]
+pg1 ansible_host=192.168.8.1
+pg2 ansible_host=192.168.8.2
+pg3 ansible_host=192.168.8.3
 
+[etcd]
+pg1 ansible_host=192.168.8.1
+pg2 ansible_host=192.168.8.2
+pg3 ansible_host=192.168.8.3
+
+[haproxy]
+lb1 ansible_host=192.168.8.8
+
+[all:vars]
+percona_postgresql_version=16

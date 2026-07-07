@@ -1,0 +1,20 @@
+[Unit]
+Description=Prometheus Node Exporter
+After=network.target
+
+[Service]
+Type=simple
+
+User={{ percona_postgresql_node_exporter_user }}
+Group={{ percona_postgresql_node_exporter_group }}
+
+ExecStart={{ percona_postgresql_node_exporter_binary }} {{ percona_postgresql_node_exporter_collectors | join(' ') }}
+
+Restart=on-failure
+RestartSec=5
+
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

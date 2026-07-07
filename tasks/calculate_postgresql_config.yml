@@ -1,0 +1,95 @@
+---
+- name: Collect system resources
+  ansible.builtin.set_fact:
+    pg_total_memory_mb: "{{ ansible_memtotal_mb }}"
+    pg_cpu_count: "{{ ansible_processor_vcpus }}"
+
+###############################################################################
+# Memory Parameters
+###############################################################################
+
+- name: Calculate shared_buffers
+  ansible.builtin.set_fact:
+    pg_shared_buffers: "{{ (pg_total_memory_mb * 0.25) | int }}MB"
+
+- name: Calculate effective_cache_size
+  ansible.builtin.set_fact:
+    pg_effective_cache_size: "{{ (pg_total_memory_mb * 0.75) | int }}MB"
+
+- name: Calculate maintenance_work_mem
+  ansible.builtin.set_fact:
+    pg_maintenance_work_mem: "{{ (pg_total_memory_mb * 0.05) | int }}MB"
+
+###############################################################################
+# Connections
+###############################################################################
+
+- name: Calculate max_connections
+  ansible.builtin.set_fact:
+    pg_max_connections: >-
+      {% if pg_total_memory_mb < 4096 %}
+      100
+      {% elif pg_total_memory_mb < 8192 %}
+      200
+      {% elif pg_total_memory_mb < 16384 %}
+      300
+      {% elif pg_total_memory_mb < 32768 %}
+      500
+      {% else %}
+      800
+      {% endif %}
+
+###############################################################################
+# work_mem
+###############################################################################
+
+- name: Calculate work_mem
+  ansible.builtin.set_fact:
+    pg_work_mem: >-
+      {{
+      (
+      (pg_total_memory_mb * 0.25)
+      /
+      pg_max_connections
+      ) | int
+      }}MB
+
+###############################################################################
+# CPU
+###############################################################################
+
+- name: Configure CPU Parameters
+  ansible.builtin.set_fact:
+    pg_max_worker_processes: "{{ pg_cpu_count }}"
+    pg_max_parallel_workers: "{{ pg_cpu_count }}"
+    pg_max_parallel_workers_per_gather: "{{ [1, (pg_cpu_count // 2)] | max }}"
+
+###############################################################################
+# Storage
+###############################################################################
+
+- name: Configure Storage Parameters
+  ansible.builtin.set_fact:
+    pg_effective_io_concurrency: >-
+      {% if percona_postgresql_storage == 'nvme' %}
+      300
+      {% elif percona_postgresql_storage == 'ssd' %}
+      200
+      {% else %}
+      2
+      {% endif %}
+
+###############################################################################
+# Workload
+###############################################################################
+
+- name: Configure Workload Parameters
+  ansible.builtin.set_fact:
+    pg_random_page_cost: >-
+      {% if percona_postgresql_workload == 'oltp' %}
+      1.1
+      {% elif percona_postgresql_workload == 'mixed' %}
+      1.5
+      {% else %}
+      2.0
+      {% endif %}

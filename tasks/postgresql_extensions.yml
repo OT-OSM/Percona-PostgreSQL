@@ -1,0 +1,55 @@
+---
+- name: Wait for PostgreSQL to become available through HAProxy
+  ansible.builtin.command:
+    cmd: >
+      pg_isready
+      -h {{ percona_postgresql_sql_host }}
+      -p {{ percona_postgresql_sql_port }}
+      -U {{ percona_postgresql_superuser_username }}
+  environment:
+    PGPASSWORD: "{{ percona_postgresql_superuser_password }}"
+  register: pg_ready
+  retries: 30
+  delay: 5
+  until: pg_ready.rc == 0
+  changed_when: false
+  run_once: true
+
+- name: Get all databases
+  ansible.builtin.command:
+    cmd: >
+      psql
+      -h {{ percona_postgresql_sql_host }}
+      -p {{ percona_postgresql_sql_port }}
+      -U {{ percona_postgresql_superuser_username }}
+      -d postgres
+      -t -A
+      -c "SELECT datname
+          FROM pg_database
+          WHERE datistemplate = false
+          AND datallowconn = true;"
+  environment:
+    PGPASSWORD: "{{ percona_postgresql_superuser_password }}"
+  register: postgres_databases
+  changed_when: false
+  run_once: true
+
+- name: Enable pg_stat_statements in all databases
+  ansible.builtin.command:
+    cmd: >
+      psql
+      -h {{ percona_postgresql_sql_host }}
+      -p {{ percona_postgresql_sql_port }}
+      -U {{ percona_postgresql_superuser_username }}
+      -d {{ item }}
+      -c "CREATE EXTENSION IF NOT EXISTS pg_stat_statements;"
+  environment:
+    PGPASSWORD: "{{ percona_postgresql_superuser_password }}"
+  loop: "{{ postgres_databases.stdout_lines }}"
+  register: extension_result
+  retries: 5
+  delay: 5
+  until: extension_result.rc == 0
+  changed_when: "'CREATE EXTENSION' in extension_result.stdout"
+  failed_when: extension_result.rc != 0
+  run_once: true
