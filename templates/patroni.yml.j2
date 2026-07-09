@@ -16,6 +16,13 @@ bootstrap:
     ttl: {{ percona_postgresql_patroni_ttl }}
     loop_wait: {{ percona_postgresql_patroni_loop_wait }}
     retry_timeout: {{ percona_postgresql_patroni_retry_timeout }}
+    maximum_lag_on_failover: {{ percona_postgresql_patroni_maximum_lag_on_failover }}
+    synchronous_mode: {{ percona_postgresql_synchronous_mode }}
+    synchronous_mode_strict: {{ percona_postgresql_synchronous_mode_strict }}
+    check_timeline: {{ percona_postgresql_check_timeline }}
+    master_start_timeout: {{ percona_postgresql_master_start_timeout }}
+    remove_data_directory_on_rewind_failure: {{ percona_postgresql_remove_data_directory_on_rewind_failure }}
+    remove_data_directory_on_diverged_timelines: {{ percona_postgresql_remove_data_directory_on_diverged_timelines }}
 
     postgresql:
       use_pg_rewind: {{ percona_postgresql_use_pg_rewind }}
@@ -30,6 +37,33 @@ bootstrap:
         wal_keep_size: {{ percona_postgresql_wal_keep_size }}
         max_slot_wal_keep_size: {{ percona_postgresql_max_slot_wal_keep_size }}
         archive_timeout: {{ percona_postgresql_archive_timeout}}
+        archive_mode: {{ percona_postgresql_archive_mode }}
+        archive_command: "{{ percona_postgresql_archive_command }}"
+        max_connections: {{ percona_postgresql_max_connections }}
+        shared_buffers: {{ percona_postgresql_shared_buffers }}
+        effective_cache_size: {{ percona_postgresql_effective_cache_size }}
+        maintenance_work_mem: {{ percona_postgresql_maintenance_work_mem }}
+        work_mem: {{ percona_postgresql_work_mem }}
+        checkpoint_timeout: {{ percona_postgresql_checkpoint_timeout }}
+        checkpoint_completion_target: {{ percona_postgresql_checkpoint_completion_target }}
+
+        max_worker_processes: {{ percona_postgresql_max_worker_processes }}
+        max_parallel_workers: {{ percona_postgresql_max_parallel_workers }}
+        max_parallel_workers_per_gather: {{ percona_postgresql_max_parallel_workers_per_gather }}
+
+        random_page_cost: {{ percona_postgresql_random_page_cost }}
+        effective_io_concurrency: {{ percona_postgresql_effective_io_concurrency }}
+
+        wal_compression: {{ percona_postgresql_wal_compression }}
+
+        logging_collector: {{ percona_postgresql_logging_collector }}
+        log_connections: {{ percona_postgresql_log_connections }}
+        log_disconnections: {{ percona_postgresql_log_disconnections }}
+        log_checkpoints: {{ percona_postgresql_log_checkpoints }}
+        log_lock_waits: {{ percona_postgresql_log_lock_waits }}
+        log_min_duration_statement: {{ percona_postgresql_log_min_duration_statement }}
+       
+
   initdb:
 {% for option in percona_postgresql_initdb_options %}
     - {{ option }}
@@ -63,6 +97,7 @@ postgresql:
     wal_keep_size: {{ percona_postgresql_wal_keep_size }}
     max_slot_wal_keep_size: {{ percona_postgresql_max_slot_wal_keep_size }}
     archive_timeout: {{ percona_postgresql_archive_timeout }}
+
   pg_hba:
 {% for rule in percona_postgresql_pg_hba %}
     - {{ rule }}

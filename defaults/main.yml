@@ -22,6 +22,11 @@ percona_postgresql_unix_socket_directories: "/var/run/postgresql"
 percona_postgresql_config_dir: "/etc/postgresql/{{ percona_postgresql_version }}/main"
 percona_postgresql_conf_file: "{{ percona_postgresql_config_dir }}/postgresql.conf"
 
+percona_postgresql_patroni_nodes:
+  - 192.168.8.19
+  - 192.168.8.20
+  - 192.168.8.27
+
 ###############################################################################
 # Patroni
 ###############################################################################
@@ -37,7 +42,16 @@ percona_postgresql_patroni_config_path: "/etc/patroni/patroni.yml"
 percona_postgresql_patroni_ttl: 30
 percona_postgresql_patroni_loop_wait: 10
 percona_postgresql_patroni_retry_timeout: 10
+percona_postgresql_patroni_maximum_lag_on_failover: 104857600
 
+
+percona_postgresql_check_timeline: true
+percona_postgresql_remove_data_directory_on_rewind_failure: true
+percona_postgresql_remove_data_directory_on_diverged_timelines: true
+
+percona_postgresql_synchronous_mode: false
+percona_postgresql_synchronous_mode_strict: false
+percona_postgresql_master_start_timeout: 300
 
 ###############################################################################
 # ETCD
@@ -71,16 +85,20 @@ percona_postgresql_haproxy_backend_name: "postgres_back"
 percona_postgresql_haproxy_max_connections: 2000
 
 percona_postgresql_haproxy_timeout_connect: "30s"
-percona_postgresql_haproxy_timeout_client: "5m"
-percona_postgresql_haproxy_timeout_server: "5m"
+percona_postgresql_haproxy_timeout_client: "30m"
+percona_postgresql_haproxy_timeout_server: "30m"
+percona_postgresql_haproxy_timeout_check: "5s"
 
-percona_postgresql_haproxy_health_check_interval: "3s"
+percona_postgresql_haproxy_health_check_interval: "5s"
 percona_postgresql_haproxy_health_check_fall: 3
 percona_postgresql_haproxy_health_check_rise: 2
 percona_postgresql_haproxy_user: haproxy
 percona_postgresql_haproxy_group: haproxy
 percona_postgresql_haproxy_stats_ssl_enable: true
 percona_postgresql_haproxy_stats_ssl_cert: "/etc/haproxy/certs/haproxy.pem"
+percona_postgresql_haproxy_tcp_keepalive: true
+percona_postgresql_haproxy_log_health_checks: true
+
 
 ###############################################################################
 # HAProxy Stats
@@ -164,10 +182,13 @@ percona_postgresql_client_network: ""
 
 
 percona_postgresql_pg_hba:
-  - "local all postgres trust"
-  - "local all all trust"
+  - "local all postgres peer"
+  - "local all all peer"
 
-  - "local replication {{ percona_postgresql_replica_user }} trust"
+  # Required for WAL-G base backups when PGUSER=postgres
+  - "local replication postgres peer"
+
+  - "local replication {{ percona_postgresql_replica_user }} peer"
   - "host replication {{ percona_postgresql_replica_user }} 127.0.0.1/32 md5"
   - "host replication {{ percona_postgresql_replica_user }} ::1/128 md5"
 
@@ -188,7 +209,57 @@ percona_postgresql_pg_hba:
 
 percona_postgresql_enable_dr: true
 
+###############################################################################
+# PostgreSQL Performance
+###############################################################################
 
+percona_postgresql_max_connections: 300
+
+percona_postgresql_shared_buffers: "2GB"
+percona_postgresql_effective_cache_size: "6GB"
+percona_postgresql_work_mem: "16MB"
+percona_postgresql_maintenance_work_mem: "512MB"
+
+percona_postgresql_checkpoint_timeout: "15min"
+percona_postgresql_checkpoint_completion_target: 0.9
+
+percona_postgresql_random_page_cost: 1.1
+percona_postgresql_effective_io_concurrency: 200
+
+percona_postgresql_max_worker_processes: 8
+percona_postgresql_max_parallel_workers: 8
+percona_postgresql_max_parallel_workers_per_gather: 4
+
+percona_postgresql_wal_compression: "on"
+
+###############################################################################
+# PostgreSQL Logging
+###############################################################################
+
+percona_postgresql_logging_collector: "on"
+
+percona_postgresql_log_connections: "on"
+percona_postgresql_log_disconnections: "on"
+percona_postgresql_log_checkpoints: "on"
+percona_postgresql_log_lock_waits: "on"
+
+percona_postgresql_log_min_duration_statement: 1000
+
+percona_postgresql_hot_standby_feedback: "on"
+
+percona_postgresql_track_io_timing: "on"
+
+percona_postgresql_tcp_keepalives_idle: 60
+
+percona_postgresql_tcp_keepalives_interval: 10
+
+percona_postgresql_tcp_keepalives_count: 6
+
+percona_postgresql_log_replication_commands: "on"
+
+percona_postgresql_log_temp_files: 0
+
+percona_postgresql_log_autovacuum_min_duration: 0
 ###############################################################################
 # PostgreSQL Extensions
 ###############################################################################
@@ -196,6 +267,7 @@ percona_postgresql_enable_dr: true
 # Libraries loaded during PostgreSQL startup
 percona_postgresql_shared_preload_libraries:
   - pg_stat_statements
+  - auto_explain
 
 # SQL endpoint (HAProxy write endpoint)
 percona_postgresql_sql_host: "192.168.8.2"
@@ -225,7 +297,17 @@ percona_postgresql_walg_envdir: "/etc/wal-g.d/env"
 percona_postgresql_walg_backup_dir: "/var/lib/postgresql/backups"
 
 percona_postgresql_wal_keep_size: "4GB"
-percona_postgresql_max_slot_wal_keep_size: "-1"
+percona_postgresql_max_slot_wal_keep_size: "20GB"
+
+###############################################################################
+# WAL Archive
+###############################################################################
+
+percona_postgresql_archive_mode: "on"
+
+percona_postgresql_archive_command: "/usr/local/bin/wal-g wal-push %p"
+
+percona_postgresql_restore_command: "/usr/local/bin/wal-g wal-fetch %f %p"
 ###############################################################################
 # MinIO Configuration
 ###############################################################################
@@ -382,7 +464,7 @@ percona_postgresql_exporter_web_listen_address: "{{ percona_postgresql_exporter_
 percona_postgresql_exporter_data_source_uri: "localhost:{{ percona_postgresql_pg_port }}/postgres?sslmode=disable"
 
 percona_postgresql_exporter_password: ""
-
+percona_postgresql_exporter_queries_file: "/etc/postgres_exporter/queries.yaml"
 percona_postgresql_exporter_collectors:
   - "--collector.statio_user_tables"
   - "--collector.stat_user_tables"

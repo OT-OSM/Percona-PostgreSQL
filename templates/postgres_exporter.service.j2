@@ -11,7 +11,9 @@ Group={{ percona_postgresql_exporter_group }}
 
 EnvironmentFile={{ percona_postgresql_exporter_config_dir }}/postgres_exporter.env
 
-ExecStart={{ percona_postgresql_exporter_binary }} {{ percona_postgresql_exporter_collectors | join(' ') }}
+ExecStart={{ percona_postgresql_exporter_binary }} \
+{{ percona_postgresql_exporter_collectors | join(' ') }} \
+--extend.query-path={{ percona_postgresql_exporter_queries_file }}
 
 Restart=on-failure
 RestartSec=5
