@@ -20,7 +20,7 @@ bootstrap:
     synchronous_mode: {{ percona_postgresql_synchronous_mode }}
     synchronous_mode_strict: {{ percona_postgresql_synchronous_mode_strict }}
     check_timeline: {{ percona_postgresql_check_timeline }}
-    master_start_timeout: {{ percona_postgresql_master_start_timeout }}
+    master_start_timeout: {{ percona_postgresql_primary_start_timeout }}
     remove_data_directory_on_rewind_failure: {{ percona_postgresql_remove_data_directory_on_rewind_failure }}
     remove_data_directory_on_diverged_timelines: {{ percona_postgresql_remove_data_directory_on_diverged_timelines }}
 
