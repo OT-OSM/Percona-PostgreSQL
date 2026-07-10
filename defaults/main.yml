@@ -39,7 +39,7 @@ percona_postgresql_patroni_rest_listen_address: "{{ ansible_default_ipv4.address
 percona_postgresql_patroni_config_dir: "/etc/patroni"
 percona_postgresql_patroni_config_path: "/etc/patroni/patroni.yml"
 
-percona_postgresql_patroni_ttl: 30
+percona_postgresql_patroni_ttl: 40
 percona_postgresql_patroni_loop_wait: 10
 percona_postgresql_patroni_retry_timeout: 10
 percona_postgresql_patroni_maximum_lag_on_failover: 104857600
@@ -52,6 +52,10 @@ percona_postgresql_remove_data_directory_on_diverged_timelines: true
 percona_postgresql_synchronous_mode: false
 percona_postgresql_synchronous_mode_strict: false
 percona_postgresql_master_start_timeout: 300
+
+percona_postgresql_log_line_prefix: "%m [%p] %u@%d %r "
+percona_postgresql_log_hostname: "on"
+percona_postgresql_log_replication_commands: "on"
 
 ###############################################################################
 # ETCD
@@ -69,6 +73,8 @@ percona_postgresql_etcd_cluster_token: "etcd-cluster"
 percona_postgresql_etcd_cluster_state: "new"
 
 percona_postgresql_etcd_reinitialize: false
+percona_postgresql_etcd_heartbeat_interval: 100
+percona_postgresql_etcd_election_timeout: 1000
 
 ###############################################################################
 # HAProxy
@@ -89,15 +95,18 @@ percona_postgresql_haproxy_timeout_client: "30m"
 percona_postgresql_haproxy_timeout_server: "30m"
 percona_postgresql_haproxy_timeout_check: "5s"
 
-percona_postgresql_haproxy_health_check_interval: "5s"
+percona_postgresql_haproxy_health_check_interval: 3s
+percona_postgresql_haproxy_health_check_fast_interval: 1s
+percona_postgresql_haproxy_health_check_down_interval: 5s
 percona_postgresql_haproxy_health_check_fall: 3
-percona_postgresql_haproxy_health_check_rise: 2
+percona_postgresql_haproxy_health_check_rise: 3
 percona_postgresql_haproxy_user: haproxy
 percona_postgresql_haproxy_group: haproxy
 percona_postgresql_haproxy_stats_ssl_enable: true
 percona_postgresql_haproxy_stats_ssl_cert: "/etc/haproxy/certs/haproxy.pem"
 percona_postgresql_haproxy_tcp_keepalive: true
 percona_postgresql_haproxy_log_health_checks: true
+percona_postgresql_haproxy_retries: 3
 
 
 ###############################################################################
@@ -249,6 +258,8 @@ percona_postgresql_hot_standby_feedback: "on"
 
 percona_postgresql_track_io_timing: "on"
 
+percona_postgresql_track_wal_io_timing: "on"
+
 percona_postgresql_tcp_keepalives_idle: 60
 
 percona_postgresql_tcp_keepalives_interval: 10
@@ -305,7 +316,7 @@ percona_postgresql_max_slot_wal_keep_size: "20GB"
 
 percona_postgresql_archive_mode: "on"
 
-percona_postgresql_archive_command: "/usr/local/bin/wal-g wal-push %p"
+percona_postgresql_archive_command: "envdir {{ percona_postgresql_walg_envdir }} wal-g wal-push %p"
 
 percona_postgresql_restore_command: "/usr/local/bin/wal-g wal-fetch %f %p"
 ###############################################################################
@@ -470,4 +481,3 @@ percona_postgresql_exporter_collectors:
   - "--collector.stat_user_tables"
   - "--collector.statio_user_indexes"
   - "--collector.stat_wal_receiver"
-  - "--collector.process_idle"

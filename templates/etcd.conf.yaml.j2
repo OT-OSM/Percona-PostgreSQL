@@ -2,6 +2,10 @@ name: {{ inventory_hostname }}
 
 data-dir: {{ percona_postgresql_etcd_data_dir }}
 
+heartbeat-interval: {{ percona_postgresql_etcd_heartbeat_interval }}
+
+election-timeout: {{ percona_postgresql_etcd_election_timeout }}
+
 listen-peer-urls: http://{{ percona_postgresql_listen_address }}:{{ percona_postgresql_etcd_peer_port }}
 
 listen-client-urls: http://{{ percona_postgresql_listen_address }}:{{ percona_postgresql_etcd_client_port }}
