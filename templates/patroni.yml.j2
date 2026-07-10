@@ -1,0 +1,131 @@
+scope: {{ percona_postgresql_cluster_name }}
+
+name: {{ inventory_hostname }}
+
+restapi:
+  listen: {{ percona_postgresql_patroni_rest_listen_address }}:{{ percona_postgresql_patroni_rest_port }}
+  connect_address: {{ hostvars[inventory_hostname].ansible_host | default(inventory_hostname) }}:{{ percona_postgresql_patroni_rest_port }}
+
+etcd3:
+  hosts: "{% for host in percona_postgresql_etcd_hosts %}{{ host }}:{{ percona_postgresql_etcd_client_port }}{% if not loop.last %},{% endif %}{% endfor %}"
+
+bootstrap:
+  method: {{ percona_postgresql_bootstrap_method }}
+
+  dcs:
+    ttl: {{ percona_postgresql_patroni_ttl }}
+    loop_wait: {{ percona_postgresql_patroni_loop_wait }}
+    retry_timeout: {{ percona_postgresql_patroni_retry_timeout }}
+    maximum_lag_on_failover: {{ percona_postgresql_patroni_maximum_lag_on_failover }}
+    synchronous_mode: {{ percona_postgresql_synchronous_mode }}
+    synchronous_mode_strict: {{ percona_postgresql_synchronous_mode_strict }}
+    check_timeline: {{ percona_postgresql_check_timeline }}
+    master_start_timeout: {{ percona_postgresql_primary_start_timeout }}
+    remove_data_directory_on_rewind_failure: {{ percona_postgresql_remove_data_directory_on_rewind_failure }}
+    remove_data_directory_on_diverged_timelines: {{ percona_postgresql_remove_data_directory_on_diverged_timelines }}
+
+    postgresql:
+      use_pg_rewind: {{ percona_postgresql_use_pg_rewind }}
+      use_slots: {{ percona_postgresql_use_slots }}
+
+    parameters:
+      wal_level: {{ percona_postgresql_wal_level }}
+      hot_standby: "{{ percona_postgresql_hot_standby }}"
+      hot_standby_feedback: "{{ percona_postgresql_hot_standby_feedback }}"
+
+      max_wal_senders: {{ percona_postgresql_max_wal_senders }}
+      max_replication_slots: {{ percona_postgresql_max_replication_slots }}
+
+      shared_preload_libraries: "{{ percona_postgresql_shared_preload_libraries | join(',') }}"
+
+      wal_keep_size: {{ percona_postgresql_wal_keep_size }}
+      max_slot_wal_keep_size: {{ percona_postgresql_max_slot_wal_keep_size }}
+
+      archive_timeout: {{ percona_postgresql_archive_timeout }}
+      archive_mode: {{ percona_postgresql_archive_mode }}
+      archive_command: "{{ percona_postgresql_archive_command }}"
+
+      max_connections: {{ percona_postgresql_max_connections }}
+      shared_buffers: {{ percona_postgresql_shared_buffers }}
+      effective_cache_size: {{ percona_postgresql_effective_cache_size }}
+      maintenance_work_mem: {{ percona_postgresql_maintenance_work_mem }}
+      work_mem: {{ percona_postgresql_work_mem }}
+
+      checkpoint_timeout: {{ percona_postgresql_checkpoint_timeout }}
+      checkpoint_completion_target: {{ percona_postgresql_checkpoint_completion_target }}
+
+      max_worker_processes: {{ percona_postgresql_max_worker_processes }}
+      max_parallel_workers: {{ percona_postgresql_max_parallel_workers }}
+      max_parallel_workers_per_gather: {{ percona_postgresql_max_parallel_workers_per_gather }}
+
+      random_page_cost: {{ percona_postgresql_random_page_cost }}
+      effective_io_concurrency: {{ percona_postgresql_effective_io_concurrency }}
+      track_io_timing: "{{ percona_postgresql_track_io_timing }}"
+      track_wal_io_timing: "{{ percona_postgresql_track_wal_io_timing }}"
+
+      wal_compression: {{ percona_postgresql_wal_compression }}
+
+      tcp_keepalives_idle: {{ percona_postgresql_tcp_keepalives_idle }}
+      tcp_keepalives_interval: {{ percona_postgresql_tcp_keepalives_interval }}
+      tcp_keepalives_count: {{ percona_postgresql_tcp_keepalives_count }}
+
+      logging_collector: {{ percona_postgresql_logging_collector }}
+      log_connections: {{ percona_postgresql_log_connections }}
+      log_disconnections: {{ percona_postgresql_log_disconnections }}
+      log_checkpoints: {{ percona_postgresql_log_checkpoints }}
+      log_lock_waits: {{ percona_postgresql_log_lock_waits }}
+      log_replication_commands: {{ percona_postgresql_log_replication_commands }}
+      log_temp_files: {{ percona_postgresql_log_temp_files }}
+      log_autovacuum_min_duration: {{ percona_postgresql_log_autovacuum_min_duration }}
+      log_min_duration_statement: {{ percona_postgresql_log_min_duration_statement }}
+      log_line_prefix: "{{ percona_postgresql_log_line_prefix }}"
+      log_hostname: {{ percona_postgresql_log_hostname }}
+      log_replication_commands: {{ percona_postgresql_log_replication_commands }}  
+
+  initdb:
+{% for option in percona_postgresql_initdb_options %}
+    - {{ option }}
+{% endfor %}
+
+  pg_hba:
+{% for rule in percona_postgresql_pg_hba %}
+    - {{ rule }}
+{% endfor %}
+
+  users:
+    {{ percona_postgresql_admin_username }}:
+      password: {{ percona_postgresql_admin_password }}
+      options:
+{% for option in percona_postgresql_admin_options %}
+        - {{ option }}
+{% endfor %}
+
+postgresql:
+  listen: {{ percona_postgresql_listen_address }}:{{ percona_postgresql_pg_port }}
+
+  connect_address: {{ hostvars[inventory_hostname].ansible_host | default(inventory_hostname) }}:{{ percona_postgresql_pg_port }}
+
+  data_dir: {{ percona_postgresql_data_dir }}
+
+  bin_dir: {{ percona_postgresql_bin_dir }}
+
+  parameters:
+    unix_socket_directories: "{{ percona_postgresql_unix_socket_directories }}"
+    shared_preload_libraries: "{{ percona_postgresql_shared_preload_libraries | join(',') }}"
+    wal_keep_size: {{ percona_postgresql_wal_keep_size }}
+    max_slot_wal_keep_size: {{ percona_postgresql_max_slot_wal_keep_size }}
+    archive_timeout: {{ percona_postgresql_archive_timeout }}
+
+  pg_hba:
+{% for rule in percona_postgresql_pg_hba %}
+    - {{ rule }}
+{% endfor %}
+
+  authentication:
+    replication:
+      username: {{ percona_postgresql_replica_user }}
+      password: {{ percona_postgresql_replica_password }}
+
+    superuser:
+      username: {{ percona_postgresql_superuser_username }}
+      password: {{ percona_postgresql_superuser_password }}

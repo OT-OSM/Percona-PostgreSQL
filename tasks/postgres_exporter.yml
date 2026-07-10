@@ -1,0 +1,72 @@
+---
+- name: Create postgres_exporter group
+  ansible.builtin.group:
+    name: "{{ percona_postgresql_exporter_group }}"
+    system: true
+
+- name: Create postgres_exporter user
+  ansible.builtin.user:
+    name: "{{ percona_postgresql_exporter_user }}"
+    group: "{{ percona_postgresql_exporter_group }}"
+    groups: "{{ percona_postgresql_group }}"
+    append: true
+    shell: /usr/sbin/nologin
+    create_home: false
+    system: true
+
+- name: Create postgres_exporter configuration directory
+  ansible.builtin.file:
+    path: "{{ percona_postgresql_exporter_config_dir }}"
+    state: directory
+    owner: "{{ percona_postgresql_exporter_user }}"
+    group: "{{ percona_postgresql_exporter_group }}"
+    mode: "0750"
+
+- name: Download postgres_exporter archive
+  ansible.builtin.get_url:
+    url: "{{ percona_postgresql_exporter_download_url }}"
+    dest: "{{ percona_postgresql_exporter_download_dest }}"
+    mode: "0644"
+
+- name: Extract postgres_exporter archive
+  ansible.builtin.unarchive:
+    src: "{{ percona_postgresql_exporter_download_dest }}"
+    dest: /tmp
+    remote_src: true
+    creates: "/tmp/postgres_exporter-{{ percona_postgresql_exporter_version }}.{{ percona_postgresql_exporter_arch }}"
+
+- name: Install postgres_exporter binary
+  ansible.builtin.copy:
+    src: "/tmp/postgres_exporter-{{ percona_postgresql_exporter_version }}.{{ percona_postgresql_exporter_arch }}/postgres_exporter"
+    dest: "{{ percona_postgresql_exporter_binary }}"
+    owner: root
+    group: root
+    mode: "0755"
+    remote_src: true
+  notify: Restart postgres_exporter
+
+- name: Configure postgres_exporter environment
+  ansible.builtin.template:
+    src: postgres_exporter.env.j2
+    dest: "{{ percona_postgresql_exporter_config_dir }}/postgres_exporter.env"
+    owner: "{{ percona_postgresql_exporter_user }}"
+    group: "{{ percona_postgresql_exporter_group }}"
+    mode: "0600"
+  notify: Restart postgres_exporter
+
+- name: Install postgres_exporter systemd service
+  ansible.builtin.template:
+    src: postgres_exporter.service.j2
+    dest: "{{ percona_postgresql_exporter_service_file }}"
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - Reload systemd
+    - Restart postgres_exporter
+
+- name: Enable and start postgres_exporter
+  ansible.builtin.systemd:
+    name: postgres_exporter
+    enabled: true
+    state: started

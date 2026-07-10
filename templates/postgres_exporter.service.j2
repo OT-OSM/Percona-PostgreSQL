@@ -1,0 +1,32 @@
+[Unit]
+Description=PostgreSQL Exporter
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=simple
+
+User={{ percona_postgresql_exporter_user }}
+Group={{ percona_postgresql_exporter_group }}
+
+EnvironmentFile={{ percona_postgresql_exporter_config_dir }}/postgres_exporter.env
+
+ExecStart={{ percona_postgresql_exporter_binary }} \
+{{ percona_postgresql_exporter_collectors | join(' ') }} \
+--extend.query-path={{ percona_postgresql_exporter_queries_file }}
+
+Restart=on-failure
+RestartSec=5
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target
