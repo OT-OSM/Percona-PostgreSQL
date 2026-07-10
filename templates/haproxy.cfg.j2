@@ -33,11 +33,7 @@ backend {{ percona_postgresql_haproxy_backend_name }}
     option httpchk GET /primary
     http-check expect status 200
 
-    default-server inter {{ percona_postgresql_haproxy_health_check_interval }} \
-               fastinter {{ percona_postgresql_haproxy_health_check_fast_interval }} \
-               downinter {{ percona_postgresql_haproxy_health_check_down_interval }} \
-               fall {{ percona_postgresql_haproxy_health_check_fall }} \
-               rise {{ percona_postgresql_haproxy_health_check_rise }}
+    default-server inter {{ percona_postgresql_haproxy_health_check_interval }} fastinter {{ percona_postgresql_haproxy_health_check_fast_interval }} downinter {{ percona_postgresql_haproxy_health_check_down_interval }} fall {{ percona_postgresql_haproxy_health_check_fall }} rise {{ percona_postgresql_haproxy_health_check_rise }}
 
 {% for host in percona_postgresql_patroni_nodes %}
     server pg{{ loop.index }} {{ host }}:{{ percona_postgresql_pg_port }} check port {{ percona_postgresql_patroni_rest_port }}
